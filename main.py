@@ -12,6 +12,11 @@ from crawler.parsers.caterpillar import CaterpillarParser
 from crawler.parsers.eightfold import EightfoldParser
 from crawler.parsers.workday import WorkdayParser
 from crawler.parsers.generic import GenericHTMLParser
+from crawler.parsers.spotify import SpotifyParser
+from crawler.parsers.oracle_hcm import OracleHCMParser
+from crawler.parsers.visa import VisaParser
+from crawler.parsers.microsoft import MicrosoftParser
+from crawler.parsers.meta import MetaParser
 from crawler.storage import ExcelStorage
 from crawler.notifier import EmailNotifier
 from crawler.filter import filter_by_keywords
@@ -30,6 +35,11 @@ PARSER_REGISTRY = {
     "eightfold": EightfoldParser,
     "workday": WorkdayParser,
     "generic": GenericHTMLParser,
+    "spotify": SpotifyParser,
+    "oracle_hcm": OracleHCMParser,
+    "visa": VisaParser,
+    "microsoft": MicrosoftParser,
+    "meta": MetaParser,
 }
 
 
