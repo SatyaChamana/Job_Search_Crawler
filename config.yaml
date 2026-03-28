@@ -1,0 +1,20 @@
+scheduler:
+  interval_minutes: 10
+
+email:
+  smtp_server: smtp.gmail.com
+  smtp_port: 587
+  sender_email: your_email@gmail.com
+  sender_password: your_app_password
+  recipient_email: recipient@example.com
+
+storage:
+  excel_file: "jobs.xlsx"
+
+sites:
+  - name: Salesforce
+    enabled: true
+    parser: salesforce
+    url: "https://careers.salesforce.com/en/jobs/?search=Software&country=United+States+of+America&pagesize=20#results"
+    target_titles:
+      - "Software Engineer"
