@@ -156,6 +156,13 @@ sites:
     target_titles:
       - "Software Engineer"
 
+  - name: Stripe
+    enabled: true
+    parser: stripe
+    url: "https://stripe.com/jobs/search?query=software&office_locations=North+America--Atlanta&office_locations=North+America--Chicago&office_locations=North+America--New+York&office_locations=North+America--San+Francisco+Bridge+HQ&office_locations=North+America--Seattle&office_locations=North+America--South+San+Francisco&office_locations=North+America--Washington+DC"
+    target_titles:
+      - "Software Engineer"
+
   - name: Oracle
     enabled: true
     parser: oracle_hcm

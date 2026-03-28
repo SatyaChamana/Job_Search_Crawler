@@ -17,6 +17,7 @@ from crawler.parsers.oracle_hcm import OracleHCMParser
 from crawler.parsers.visa import VisaParser
 from crawler.parsers.microsoft import MicrosoftParser
 from crawler.parsers.meta import MetaParser
+from crawler.parsers.stripe import StripeParser
 from crawler.storage import ExcelStorage
 from crawler.notifier import EmailNotifier
 from crawler.filter import filter_by_keywords
@@ -40,6 +41,7 @@ PARSER_REGISTRY = {
     "visa": VisaParser,
     "microsoft": MicrosoftParser,
     "meta": MetaParser,
+    "stripe": StripeParser,
 }
 
 
