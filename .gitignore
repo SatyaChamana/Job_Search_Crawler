@@ -8,4 +8,5 @@ build/
 venv/
 jobs.xlsx
 *.xlsx
+!Career Links.xlsx
 .env
