@@ -6,6 +6,12 @@ import yaml
 import schedule
 
 from crawler.parsers.salesforce import SalesforceParser
+from crawler.parsers.airbnb import AirbnbParser
+from crawler.parsers.apple import AppleParser
+from crawler.parsers.caterpillar import CaterpillarParser
+from crawler.parsers.eightfold import EightfoldParser
+from crawler.parsers.workday import WorkdayParser
+from crawler.parsers.generic import GenericHTMLParser
 from crawler.storage import ExcelStorage
 from crawler.notifier import EmailNotifier
 from crawler.filter import filter_by_keywords
@@ -18,6 +24,12 @@ logger = logging.getLogger(__name__)
 
 PARSER_REGISTRY = {
     "salesforce": SalesforceParser,
+    "airbnb": AirbnbParser,
+    "apple": AppleParser,
+    "caterpillar": CaterpillarParser,
+    "eightfold": EightfoldParser,
+    "workday": WorkdayParser,
+    "generic": GenericHTMLParser,
 }
 
 
