@@ -4,9 +4,9 @@ scheduler:
 email:
   smtp_server: smtp.gmail.com
   smtp_port: 587
-  sender_email: your_email@gmail.com
-  sender_password: your_app_password
-  recipient_email: recipient@example.com
+  sender_email: satyachamana@gmail.com
+  sender_password: dvtf ukbg fglt zrtr
+  recipient_email: satyajason143@gmail.com
 
 storage:
   excel_file: "jobs.xlsx"
@@ -15,9 +15,18 @@ sites:
   - name: Salesforce
     enabled: true
     parser: salesforce
-    url: "https://careers.salesforce.com/en/jobs/?search=Software&country=United+States+of+America&pagesize=20#results"
+    url: "https://careers.salesforce.com/en/jobs/?search=Software&country=United+States+of+America&pagesize=30#results"
     target_titles:
       - "Software Engineer"
+
+  - name: Salesforce
+    enabled: true
+    parser: salesforce
+    url: "https://careers.salesforce.com/en/jobs/?search=Data&country=United+States+of+America&pagesize=30#results"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
 
   - name: Airbnb
     enabled: true
@@ -145,8 +154,6 @@ sites:
       - "ML Engineer"
       - "Machine Learning Engineer"
       - "Fullstack Engineer"
-      - "iOS Engineer"
-      - "Android Engineer"
 
   - name: Tesla
     enabled: true
@@ -166,7 +173,7 @@ sites:
   - name: Oracle
     enabled: true
     parser: oracle_hcm
-    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?lastSelectedFacet=AttributeChar13&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22"
+    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?keyword=software&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22&selectedPostingDatesFacet=7"
     wait_ms: 12000
     target_titles:
       - "Software Engineer"
