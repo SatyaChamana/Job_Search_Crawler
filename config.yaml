@@ -1,8 +1,8 @@
 scheduler:
   interval_min_minutes: 18
-  interval_max_minutes: 26
-  start_hour: 8
-  stop_hour: 22
+  interval_max_minutes: 23
+  start_hour: 7
+  stop_hour: 23
 
 email:
   smtp_server: smtp.gmail.com
@@ -519,6 +519,73 @@ sites:
       - "Data Scientist"
       - "Data Analyst"
       - "ML Engineer"
+
+  - name: T-Mobile
+    enabled: true
+    parser: workday
+    url: "https://careers.t-mobile.com/jobs?keyword=software&sort_by=update_date"
+    workday_url: "https://tmobile.wd1.myworkdayjobs.com/wday/cxs/tmobile/External/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: T-Mobile
+    enabled: true
+    parser: workday
+    url: "https://careers.t-mobile.com/jobs?keyword=data&sort_by=update_date"
+    workday_url: "https://tmobile.wd1.myworkdayjobs.com/wday/cxs/tmobile/External/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Lowes
+    enabled: true
+    parser: phenom
+    url: "https://talent.lowes.com/us/en/search-results?category=Technology"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "AI Engineer"
+      - "ML Engineer"
+
+  - name: HPE
+    enabled: true
+    parser: phenom
+    url: "https://careers.hpe.com/us/en/search-results?keywords=software&category=Engineering%20%26%20QA"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+    target_locations:
+      - "United States of America"
+
+  - name: HPE
+    enabled: true
+    parser: phenom
+    url: "https://careers.hpe.com/us/en/search-results?keywords=data&category=Engineering%20%26%20QA"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+    target_locations:
+      - "United States of America"
 
   - name: Intel
     enabled: true

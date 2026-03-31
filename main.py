@@ -78,6 +78,9 @@ def _crawl_site(parser, site_name, storage, site_config):
         jobs = parser.fetch_and_parse()
         logger.info(f"Found {len(jobs)} matching jobs from {site_name}")
         jobs = filter_by_keywords(jobs)
+        target_locations = site_config.get("target_locations", [])
+        if target_locations:
+            jobs = [j for j in jobs if any(loc.lower() in j.location.lower() for loc in target_locations)]
         new_jobs = storage.add_jobs(jobs)
         result = CrawlSiteResult(
             label=site_name,
@@ -216,9 +219,9 @@ def main():
 
     sched_cfg = config.get("scheduler", {})
     interval_min = sched_cfg.get("interval_min_minutes", 18)
-    interval_max = sched_cfg.get("interval_max_minutes", 26)
-    start_hour = sched_cfg.get("start_hour", 8)
-    stop_hour = sched_cfg.get("stop_hour", 22)
+    interval_max = sched_cfg.get("interval_max_minutes", 24)
+    start_hour = sched_cfg.get("start_hour", 7)
+    stop_hour = sched_cfg.get("stop_hour", 23)
     report_interval = config.get("health_report_interval", 10)
     logger.info(f"Starting scheduled crawler (every {interval_min}–{interval_max} min, active {start_hour}:00–{stop_hour}:00)")
 
@@ -230,7 +233,7 @@ def main():
 
     while True:
         now = datetime.now()
-
+        logger.info(f"Current time: {now.strftime('%I:%M %p')}")
         if now.hour >= stop_hour or now.hour < start_hour:
             # Outside active hours — sleep until start_hour
             wake = now.replace(hour=start_hour, minute=0, second=0, microsecond=0)
