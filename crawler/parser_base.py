@@ -19,6 +19,18 @@ class JobPosting:
         return f"{self.title.strip().lower()}|{self.job_id.strip().lower()}"
 
 
+@dataclass
+class CrawlSiteResult:
+    label: str           # "Adobe (Software)"
+    site_name: str       # "Adobe"
+    search_text: str     # "Software"
+    parser_name: str     # "workday"
+    success: bool
+    error_message: str = ""
+    jobs_found: int = 0
+    new_jobs_added: int = 0
+
+
 class ParserBase(ABC):
     def __init__(self, site_config: dict):
         self.site_config = site_config

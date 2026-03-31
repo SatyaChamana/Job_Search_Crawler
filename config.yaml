@@ -1,12 +1,15 @@
 scheduler:
-  interval_minutes: 10
+  interval_min_minutes: 18
+  interval_max_minutes: 26
+  start_hour: 8
+  stop_hour: 22
 
 email:
   smtp_server: smtp.gmail.com
   smtp_port: 587
-  sender_email: your_email@gmail.com
-  sender_password: your_app_password
-  recipient_email: recipient@example.com
+  sender_email: satyachamana@gmail.com
+  sender_password: dvtf ukbg fglt zrtr
+  recipient_email: satyajason143@gmail.com
 
 storage:
   excel_file: "jobs.xlsx"
@@ -15,9 +18,19 @@ sites:
   - name: Salesforce
     enabled: true
     parser: salesforce
-    url: "https://careers.salesforce.com/en/jobs/?search=Software&country=United+States+of+America&pagesize=20#results"
+    url: "https://careers.salesforce.com/en/jobs/?search=Software&country=United+States+of+America&pagesize=30#results"
     target_titles:
       - "Software Engineer"
+
+  - name: Salesforce
+    enabled: true
+    parser: salesforce
+    url: "https://careers.salesforce.com/en/jobs/?search=Data&country=United+States+of+America&pagesize=30#results"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Airbnb
     enabled: true
@@ -25,6 +38,16 @@ sites:
     url: "https://careers.airbnb.com/positions/?_search_input=software"
     target_titles:
       - "Software Engineer"
+
+  - name: Airbnb
+    enabled: true
+    parser: airbnb
+    url: "https://careers.airbnb.com/positions/?_search_input=data"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Adobe
     enabled: true
@@ -35,6 +58,19 @@ sites:
     limit: 20
     target_titles:
       - "Software Engineer"
+
+  - name: Adobe
+    enabled: true
+    parser: workday
+    url: "https://careers.adobe.com/us/en/search-results?keywords=data"
+    workday_url: "https://adobe.wd5.myworkdayjobs.com/wday/cxs/adobe/external_experienced/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Amex
     enabled: true
@@ -48,12 +84,37 @@ sites:
     target_titles:
       - "Software Engineer"
 
+  - name: Amex
+    enabled: true
+    parser: eightfold
+    url: "https://aexp.eightfold.ai/careers?pid=40032366&domain=aexp.com&sort_by=relevance&hl=en"
+    eightfold_domain: "aexp.eightfold.ai"
+    eightfold_company_domain: "aexp.com"
+    search_text: "data"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
   - name: Apple
     enabled: true
     parser: apple
     url: "https://jobs.apple.com/en-us/search?search=Software&sort=relevance&location=united-states-USA"
     target_titles:
       - "Software Engineer"
+
+  - name: Apple
+    enabled: true
+    parser: apple
+    url: "https://jobs.apple.com/en-us/search?search=Data&sort=relevance&location=united-states-USA"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Cisco
     enabled: true
@@ -63,59 +124,141 @@ sites:
     target_titles:
       - "Software Engineer"
 
+  - name: Cisco
+    enabled: true
+    parser: generic
+    url: "https://jobs.cisco.com/jobs/SearchJobs/data?21178=%5B169482%5D&21178_format=6020&listFilterMode=1"
+    wait_ms: 8000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
   - name: Caterpillar
     enabled: true
     parser: caterpillar
-    url: "https://careers.caterpillar.com/en/jobs/?search=Software#results"
+    url: "https://careers.caterpillar.com/en/jobs/?search=Software&country=United+States+of+America#results"
+    target_titles:
+      - "Software Engineer"
+
+  - name: Caterpillar
+    enabled: true
+    parser: caterpillar
+    url: "https://careers.caterpillar.com/en/jobs/?search=Data&country=United+States+of+America#results"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Ford
+    enabled: true
+    parser: ford
+    url: "https://jobs.ford.com/careers?query=Software&start=0&location=united+states&pid=563568451106238&sort_by=timestamp&filter_include_remote=1"
     target_titles:
       - "Software Engineer"
 
   - name: Ford
     enabled: true
-    parser: generic
-    url: "https://jobs.ford.com/careers?query=Software&start=0&location=united+states&pid=563568450711045&sort_by=relevance&filter_include_remote=1"
-    wait_ms: 8000
+    parser: ford
+    url: "https://jobs.ford.com/careers?query=data&start=0&location=united+states&pid=563568451106238&sort_by=timestamp&filter_include_remote=1"
     target_titles:
-      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Meta
-    enabled: true
+    enabled: false
     parser: meta
     url: "https://www.metacareers.com/jobs?query=software&is_leadership=0&offices[0]=United%20States"
     target_titles:
       - "Software Engineer"
 
+  - name: Meta
+    enabled: false
+    parser: meta
+    url: "https://www.metacareers.com/jobs?query=data&is_leadership=0&offices[0]=United%20States"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
   - name: PayPal
     enabled: true
-    parser: generic
-    url: "https://paypal.eightfold.ai/careers?query=software&start=0&location=united+states&pid=274917400223&sort_by=relevance&filter_include_remote=1"
-    wait_ms: 8000
+    parser: paypal
+    url: "https://paypal.eightfold.ai/careers?query=software&start=0&location=united+states&pid=274918569749&sort_by=timestamp&filter_include_remote=1"
     target_titles:
       - "Software Engineer"
 
-  - name: Microsoft
+  - name: PayPal
     enabled: true
+    parser: paypal
+    url: "https://paypal.eightfold.ai/careers?query=data&start=0&location=united+states&pid=274918569749&sort_by=timestamp&filter_include_remote=1"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Microsoft
+    enabled: false
     parser: microsoft
     url: "https://jobs.careers.microsoft.com/global/en/search?q=SDE&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
     search_text: "SDE"
     target_titles:
       - "Software Engineer"
 
+  - name: Microsoft
+    enabled: false
+    parser: microsoft
+    url: "https://jobs.careers.microsoft.com/global/en/search?q=data&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
+    search_text: "data"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
   - name: JPMC
     enabled: true
     parser: oracle_hcm
-    url: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs?keyword=Software+Engineer&location=United+States&locationId=300000000289738&locationLevel=country&mode=location"
+    url: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs?keyword=Software+Engineer&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000289738&locationLevel=country&mode=location&selectedPostingDatesFacet=7&sortBy=POSTING_DATES_DESC"
     wait_ms: 12000
+    target_titles:
+      - "Software Engineer"
+
+  - name: JPMC
+    enabled: true
+    parser: oracle_hcm
+    url: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs?keyword=Data&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000289738&locationLevel=country&mode=location&selectedPostingDatesFacet=7&sortBy=POSTING_DATES_DESC"
+    wait_ms: 12000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Goldman Sachs
+    enabled: true
+    parser: generic
+    url: "https://higher.gs.com/results?LOCATION=Los%20Angeles|Newport%20Beach|San%20Francisco|Wilmington|Washington|Miami|West%20Palm%20Beach|Atlanta|Chicago|Boston|Detroit|Troy|Jersey%20City|Albany|New%20York|Philadelphia|Pittsburgh|Dallas|Houston|Richardson|Draper|Salt%20Lake%20City|Seattle&page=1&search=software&sort=POSTED_DATE"
+    wait_ms: 8000
     target_titles:
       - "Software Engineer"
 
   - name: Goldman Sachs
     enabled: true
     parser: generic
-    url: "https://higher.gs.com/results?LOCATION=Albany|New%20York|Atlanta|Austin|Dallas|Houston|Richardson|Boston|Chicago|Detroit|Troy|Draper|Salt%20Lake%20City|Jersey%20City|Los%20Angeles|Newport%20Beach|San%20Francisco|Miami|West%20Palm%20Beach|Philadelphia|Pittsburgh|Saint%20Louis|Seattle|Washington|Wilmington&page=1&search=software&sort=RELEVANCE"
+    url: "https://higher.gs.com/results?LOCATION=Los%20Angeles|Newport%20Beach|San%20Francisco|Wilmington|Washington|Miami|West%20Palm%20Beach|Atlanta|Chicago|Boston|Detroit|Troy|Jersey%20City|Albany|New%20York|Philadelphia|Pittsburgh|Dallas|Houston|Richardson|Draper|Salt%20Lake%20City|Seattle&page=1&search=data&sort=POSTED_DATE"
     wait_ms: 8000
     target_titles:
-      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: DoorDash
     enabled: true
@@ -125,6 +268,17 @@ sites:
     target_titles:
       - "Software Engineer"
 
+  - name: DoorDash
+    enabled: true
+    parser: generic
+    url: "https://careersatdoordash.com/job-search/?keyword=data&location=&spage=1"
+    wait_ms: 8000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
   - name: Visa
     enabled: true
     parser: visa
@@ -132,6 +286,17 @@ sites:
     wait_ms: 10000
     target_titles:
       - "Software Engineer"
+
+  - name: Visa
+    enabled: true
+    parser: visa
+    url: "https://corporate.visa.com/en/jobs/?q=data&cities=Ashburn&cities=Atlanta&cities=Austin&cities=Bellevue&cities=Denver&cities=Foster%20City&cities=Highlands%20Ranch&cities=Lehi&cities=Los%20Angeles&cities=Mentor&cities=Miami&cities=New%20York&cities=San%20Francisco&cities=Washington&cities=Wilmington"
+    wait_ms: 10000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
 
   - name: Spotify
     enabled: true
@@ -145,22 +310,282 @@ sites:
       - "ML Engineer"
       - "Machine Learning Engineer"
       - "Fullstack Engineer"
-      - "iOS Engineer"
-      - "Android Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
 
   - name: Tesla
-    enabled: true
+    enabled: false
     parser: generic
     url: "https://www.tesla.com/careers/search/?site=US"
     wait_ms: 10000
     target_titles:
       - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Stripe
+    enabled: true
+    parser: stripe
+    url: "https://stripe.com/jobs/search?query=software&office_locations=North+America--Atlanta&office_locations=North+America--Chicago&office_locations=North+America--New+York&office_locations=North+America--San+Francisco+Bridge+HQ&office_locations=North+America--Seattle&office_locations=North+America--South+San+Francisco&office_locations=North+America--Washington+DC"
+    target_titles:
+      - "Software Engineer"
+
+  - name: Stripe
+    enabled: true
+    parser: stripe
+    url: "https://stripe.com/jobs/search?query=data&office_locations=North+America--Atlanta&office_locations=North+America--Chicago&office_locations=North+America--New+York&office_locations=North+America--San+Francisco+Bridge+HQ&office_locations=North+America--Seattle&office_locations=North+America--South+San+Francisco&office_locations=North+America--Washington+DC"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Uber
+    enabled: true
+    parser: uber
+    url: "https://www.uber.com/us/en/careers/list/?query=Software%20Data&location=USA-California-San%20Francisco&location=USA-California-Los%20Angeles&location=USA-New%20York-New%20York&location=USA-Illinois-Chicago&location=USA-Washington-Seattle&location=USA-California-Sunnyvale&location=USA-Arizona-Phoenix&location=USA-Florida-Miami&location=USA-Massachusetts-Boston&location=USA-Tennessee-Nashville&location=USA-Colorado-Denver"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Databricks
+    enabled: true
+    parser: databricks
+    url: "https://www.databricks.com/company/careers/open-positions?department=Engineering&location=West%20Coast%20-%20United%20States"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Abbott
+    enabled: true
+    parser: phenom
+    url: "https://www.jobs.abbott/us/en/search-results?keywords=Software"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+
+  - name: Abbott
+    enabled: true
+    parser: phenom
+    url: "https://www.jobs.abbott/us/en/search-results?keywords=Data"
+    wait_ms: 8000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Walmart
+    enabled: true
+    parser: walmart
+    url: "https://careers.walmart.com/us/en/results?searchQuery=software%20engineering%20and%20architecture%20&careerareas=Technology"
+    search_text: "software engineering and architecture"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Walmart
+    enabled: true
+    parser: walmart
+    url: "https://careers.walmart.com/us/en/results?searchQuery=data%20engineering%20and%20architecture%20&careerareas=Technology"
+    search_text: "software engineering and architecture"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
+
+  - name: Autodesk
+    enabled: true
+    parser: workday
+    url: "https://autodesk.wd1.myworkdayjobs.com/Ext?q=software&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://autodesk.wd1.myworkdayjobs.com/wday/cxs/autodesk/Ext/jobs"
+    search_text: "software"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Software Architect"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Autodesk
+    enabled: true
+    parser: workday
+    url: "https://autodesk.wd1.myworkdayjobs.com/Ext?q=data&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://autodesk.wd1.myworkdayjobs.com/wday/cxs/autodesk/Ext/jobs"
+    search_text: "data"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Software Architect"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Zillow
+    enabled: true
+    parser: workday
+    url: "https://zillow.wd5.myworkdayjobs.com/Zillow_Group_External?q=software"
+    workday_url: "https://zillow.wd5.myworkdayjobs.com/wday/cxs/zillow/Zillow_Group_External/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Zillow
+    enabled: true
+    parser: workday
+    url: "https://zillow.wd5.myworkdayjobs.com/Zillow_Group_External?q=data"
+    workday_url: "https://zillow.wd5.myworkdayjobs.com/wday/cxs/zillow/Zillow_Group_External/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Qualtrics
+    enabled: true
+    parser: phenom
+    url: "https://www.qualtrics.com/careers/us/en/search-results?m=3&keywords=software"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Qualtrics
+    enabled: true
+    parser: phenom
+    url: "https://www.qualtrics.com/careers/us/en/search-results?m=3&keywords=data"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: DocuSign
+    enabled: true
+    parser: jibe
+    url: "https://careers.docusign.com/jobs?keywords=software&sortBy=posted_date&page=1&descending=true"
+    jibe_base_url: "https://careers.docusign.com"
+    search_text: "software"
+    location: "United States"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: DocuSign
+    enabled: true
+    parser: jibe
+    url: "https://careers.docusign.com/jobs?keywords=data&sortBy=posted_date&page=1&descending=true"
+    jibe_base_url: "https://careers.docusign.com"
+    search_text: "data"
+    location: "United States"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Intel
+    enabled: true
+    parser: workday
+    url: "https://intel.wd1.myworkdayjobs.com/External?q=software&locations=1e4a4eb3adf101b8aec18a77bf810dd0&locations=1e4a4eb3adf1018c4bf78f77bf8112d0&locations=1e4a4eb3adf10118b1dfe877bf8162d0&locations=1e4a4eb3adf101989587fd77bf8176d0&locations=da6b8032b879100204a63a809f6c0000&locations=1e4a4eb3adf10146fd5c5276bf81eece&locations=1e4a4eb3adf1011246675c76bf81f8ce&locations=1e4a4eb3adf1016541777876bf8111cf&locations=1e4a4eb3adf101fa2a777d76bf8116cf&locations=1e4a4eb3adf10129d05fe377bf815dd0"
+    workday_url: "https://intel.wd1.myworkdayjobs.com/wday/cxs/intel/External/jobs"
+    search_text: "software"
+    limit: 20
+    applied_facets:
+      locations:
+        - "1e4a4eb3adf101b8aec18a77bf810dd0"
+        - "1e4a4eb3adf1018c4bf78f77bf8112d0"
+        - "1e4a4eb3adf10118b1dfe877bf8162d0"
+        - "1e4a4eb3adf101989587fd77bf8176d0"
+        - "da6b8032b879100204a63a809f6c0000"
+        - "1e4a4eb3adf10146fd5c5276bf81eece"
+        - "1e4a4eb3adf1011246675c76bf81f8ce"
+        - "1e4a4eb3adf1016541777876bf8111cf"
+        - "1e4a4eb3adf101fa2a777d76bf8116cf"
+        - "1e4a4eb3adf10129d05fe377bf815dd0"
+    target_titles:
+      - "Software"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Intel
+    enabled: true
+    parser: workday
+    url: "https://intel.wd1.myworkdayjobs.com/External?q=data&locations=1e4a4eb3adf101b8aec18a77bf810dd0&locations=1e4a4eb3adf1018c4bf78f77bf8112d0&locations=1e4a4eb3adf10118b1dfe877bf8162d0&locations=1e4a4eb3adf101989587fd77bf8176d0&locations=da6b8032b879100204a63a809f6c0000&locations=1e4a4eb3adf10146fd5c5276bf81eece&locations=1e4a4eb3adf1011246675c76bf81f8ce&locations=1e4a4eb3adf1016541777876bf8111cf&locations=1e4a4eb3adf101fa2a777d76bf8116cf&locations=1e4a4eb3adf10129d05fe377bf815dd0"
+    workday_url: "https://intel.wd1.myworkdayjobs.com/wday/cxs/intel/External/jobs"
+    search_text: "data"
+    limit: 20
+    applied_facets:
+      locations:
+        - "1e4a4eb3adf101b8aec18a77bf810dd0"
+        - "1e4a4eb3adf1018c4bf78f77bf8112d0"
+        - "1e4a4eb3adf10118b1dfe877bf8162d0"
+        - "1e4a4eb3adf101989587fd77bf8176d0"
+        - "da6b8032b879100204a63a809f6c0000"
+        - "1e4a4eb3adf10146fd5c5276bf81eece"
+        - "1e4a4eb3adf1011246675c76bf81f8ce"
+        - "1e4a4eb3adf1016541777876bf8111cf"
+        - "1e4a4eb3adf101fa2a777d76bf8116cf"
+        - "1e4a4eb3adf10129d05fe377bf815dd0"
+    target_titles:
+      - "Software"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
 
   - name: Oracle
     enabled: true
     parser: oracle_hcm
-    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?lastSelectedFacet=AttributeChar13&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22"
+    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?keyword=software&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22&selectedPostingDatesFacet=7"
     wait_ms: 12000
     target_titles:
       - "Software Engineer"
       - "Software Developer"
+
+  - name: Oracle
+    enabled: true
+    parser: oracle_hcm
+    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?keyword=data&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22&selectedPostingDatesFacet=7"
+    wait_ms: 12000
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Analyst"
+      - "ML Engineer"
