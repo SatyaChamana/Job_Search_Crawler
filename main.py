@@ -27,6 +27,9 @@ from crawler.parsers.ford import FordParser
 from crawler.parsers.phenom import PhenomParser
 from crawler.parsers.walmart import WalmartParser
 from crawler.parsers.jibe import JibeParser
+from crawler.parsers.radancy import RadancyParser
+from crawler.parsers.greenhouse import GreenhouseParser
+from crawler.parsers.greenhouse_api import GreenhouseAPIParser
 from crawler.parser_base import CrawlSiteResult
 from crawler.storage import ExcelStorage
 from crawler.notifier import EmailNotifier
@@ -59,6 +62,9 @@ PARSER_REGISTRY = {
     "phenom": PhenomParser,
     "walmart": WalmartParser,
     "jibe": JibeParser,
+    "radancy": RadancyParser,
+    "greenhouse": GreenhouseParser,
+    "greenhouse_api": GreenhouseAPIParser,
 }
 
 

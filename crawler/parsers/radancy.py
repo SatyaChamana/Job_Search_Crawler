@@ -1,0 +1,90 @@
+import logging
+from typing import List
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
+import requests
+from bs4 import BeautifulSoup
+
+from crawler.parser_base import ParserBase, JobPosting
+
+logger = logging.getLogger(__name__)
+
+MAX_PAGES = 20
+
+
+class RadancyParser(ParserBase):
+    """Parser for Radancy/TMP-powered career sites (Wells Fargo, Chime, etc.).
+
+    Static HTML with .card.card-job elements and ?page= pagination.
+    """
+
+    def fetch_and_parse(self) -> List[JobPosting]:
+        parsed = urlparse(self.url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+
+        logger.info(f"[{self.site_name}] Fetching careers from {base_url}...")
+
+        all_jobs = []
+        seen_ids = set()
+
+        for page in range(1, MAX_PAGES + 1):
+            page_url = self._build_url(page)
+            resp = requests.get(
+                page_url,
+                headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, "html.parser")
+            cards = soup.select(".card.card-job")
+
+            if not cards:
+                break
+
+            for card in cards:
+                title_el = card.select_one("h2.card-title a, h3.card-title a")
+                if not title_el:
+                    continue
+
+                id_el = card.select_one("[data-id]")
+                job_id = id_el.get("data-id", "") if id_el else ""
+                if not job_id or job_id in seen_ids:
+                    continue
+                seen_ids.add(job_id)
+
+                title = title_el.get_text(strip=True)
+                href = title_el.get("href", "")
+                meta_items = card.select("ul.job-meta li.list-inline-item")
+                location = ""
+                date_posted = ""
+                for item in meta_items:
+                    icon = item.select_one("svg use, i")
+                    icon_ref = (icon.get("xlink:href", "") or icon.get("class", "")) if icon else ""
+                    text = item.get_text(strip=True)
+                    if "map-marker" in icon_ref or "location" in icon_ref:
+                        location = text
+                    elif "calendar" in icon_ref or "clock" in icon_ref:
+                        date_posted = text
+                if not location and meta_items:
+                    location = "; ".join(m.get_text(strip=True) for m in meta_items)
+
+                all_jobs.append(JobPosting(
+                    job_id=job_id,
+                    title=title,
+                    location=location,
+                    url=f"{base_url}{href}" if href.startswith("/") else href,
+                    company=self.site_name,
+                    date_posted=date_posted,
+                ))
+
+            logger.info(f"[{self.site_name}] Page {page}: {len(cards)} jobs")
+
+        logger.info(f"[{self.site_name}] Found {len(all_jobs)} jobs total")
+        return self.filter_by_title(all_jobs)
+
+    def _build_url(self, page: int) -> str:
+        parsed = urlparse(self.url)
+        params = parse_qs(parsed.query, keep_blank_values=True)
+        params["page"] = [str(page)]
+        new_query = urlencode(params, doseq=True)
+        return urlunparse(parsed._replace(query=new_query))

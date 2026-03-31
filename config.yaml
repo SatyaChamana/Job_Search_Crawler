@@ -587,6 +587,129 @@ sites:
     target_locations:
       - "United States of America"
 
+  - name: Wells Fargo
+    enabled: true
+    parser: radancy
+    url: "https://www.wellsfargojobs.com/en/jobs/?search=software&country=United+States+of+America"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Wells Fargo
+    enabled: true
+    parser: radancy
+    url: "https://www.wellsfargojobs.com/en/jobs/?search=data&country=United+States+of+America"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Chime
+    enabled: true
+    parser: radancy
+    url: "https://careers.chime.com/en/jobs/?keyword=software&pagesize=20"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Chime
+    enabled: true
+    parser: radancy
+    url: "https://careers.chime.com/en/jobs/?keyword=data&pagesize=20"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Waymo
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.withwaymo.com/jobs/search?page=1&country_codes%5B%5D=US&query=software"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Waymo
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.withwaymo.com/jobs/search?page=1&country_codes%5B%5D=US&query=data"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Zoom
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.zoom.us/jobs/search?page=1&country_codes%5B%5D=US&query=software"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Zoom
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.zoom.us/jobs/search?page=1&country_codes%5B%5D=US&query=data"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Cloudflare
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.cloudflare.com/careers/jobs/?title=software"
+    greenhouse_board: "cloudflare"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: CrowdStrike
+    enabled: true
+    parser: workday
+    url: "https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers?q=software&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://crowdstrike.wd5.myworkdayjobs.com/wday/cxs/crowdstrike/crowdstrikecareers/jobs"
+    search_text: "software"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: CrowdStrike
+    enabled: true
+    parser: workday
+    url: "https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers?q=data&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://crowdstrike.wd5.myworkdayjobs.com/wday/cxs/crowdstrike/crowdstrikecareers/jobs"
+    search_text: "data"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
   - name: Intel
     enabled: true
     parser: workday

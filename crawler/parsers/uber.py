@@ -9,7 +9,7 @@ from crawler.parser_base import ParserBase, JobPosting
 logger = logging.getLogger(__name__)
 
 API_URL = "https://www.uber.com/api/loadSearchJobsResults?localeCode=en"
-JOB_URL_TEMPLATE = "https://www.uber.com/us/en/careers/list/{job_id}/"
+JOB_URL_TEMPLATE = "https://www.uber.com/global/en/careers/list/{job_id}/"
 MAX_PAGES = 10
 
 

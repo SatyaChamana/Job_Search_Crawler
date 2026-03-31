@@ -1,167 +1,107 @@
-# Job Search Crawler - Claude Code Instructions
+# Job Search Crawler
 
-## Project Overview
+Python crawler that scrapes career pages, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
 
-This is a Python job search crawler that scrapes career pages from multiple companies. Jobs are saved to `jobs.xlsx` with deduplication. Configuration is in `config.yaml`.
+## Architecture
 
-## Key Files
-
-- `main.py` - Entry point. Contains `PARSER_REGISTRY` dict mapping parser names to classes.
-- `config.yaml` - All site configurations, email settings, scheduler interval.
-- `crawler/parser_base.py` - `JobPosting` dataclass and `ParserBase` ABC.
-- `crawler/browser.py` - `fetch_rendered_html()` using Playwright for JS-heavy sites.
-- `crawler/fetcher.py` - `fetch_page()` and `fetch_json()` for static fetching.
-- `crawler/storage.py` - `ExcelStorage` class with dedup via `title|job_id` keys.
-- `Career Links.xlsx` - Master list of career URLs. Column A = company, Column B = URL, Column C = status.
-
-## Parser Types Available
-
-| Parser | Use When | Config Keys |
-|--------|----------|-------------|
-| `generic` | Unknown site, try HTML then browser fallback | `wait_ms` |
-| `workday` | Workday-powered sites (wd5.myworkdayjobs.com) | `workday_url`, `search_text`, `limit` |
-| `eightfold` | Eightfold.ai-powered sites | `eightfold_domain`, `eightfold_company_domain`, `search_text`, `search_location` |
-| `oracle_hcm` | Oracle HCM Cloud sites (fa.oraclecloud.com) | `wait_ms` |
-| `spotify` | Spotify only (custom API) | `categories`, `search_location` |
-| `salesforce` | Salesforce only | - |
-| `airbnb` | Airbnb only | - |
-| `apple` | Apple only | - |
-| `caterpillar` | Caterpillar only | - |
-| `visa` | Visa only | `wait_ms` |
-| `microsoft` | Microsoft only | `search_text` |
-| `meta` | Meta only | - |
-
-## How to Add a New Website Parser
-
-When the user adds a new career link to `Career Links.xlsx`, follow these steps:
-
-### Step 1: Investigate the site
-
-```python
-# Try static HTML first
-from crawler.fetcher import fetch_page
-r = fetch_page("https://example.com/careers?search=Software")
-# Check if job listings are in the HTML
-
-# If not, try browser rendering
-from crawler.browser import fetch_rendered_html
-html = fetch_rendered_html("https://example.com/careers", wait_ms=8000)
-# Parse with BeautifulSoup to find job elements
+```
+main.py                     # Entry point, PARSER_REGISTRY, _crawl_site(), crawl_once(), main()
+config.yaml                 # Sites, email, scheduler, health_report_interval
+crawler/
+  parser_base.py            # JobPosting, CrawlSiteResult dataclasses, ParserBase ABC
+  storage.py                # ExcelStorage (dedup via title|job_id, get_jobs_added_today_count)
+  notifier.py               # EmailNotifier (job alerts + send_health_report with HTML email)
+  fetcher.py                # fetch_page(), fetch_json() for static HTTP
+  browser.py                # fetch_rendered_html() via Playwright
+  filter.py                 # filter_by_keywords() post-filter
+  parsers/                  # One file per parser (see registry below)
+Career Links.xlsx           # Master list: Col A=company, B=URL, C=status (Working/Not Working/Not Configured)
+jobs.xlsx                   # Output: deduplicated job postings
 ```
 
-### Step 2: Identify the platform
+## Parser Registry (21 parsers)
 
-Check if the site uses a known platform:
-- **Workday**: URL contains `wd5.myworkdayjobs.com` or similar. Use `workday` parser.
-- **Eightfold**: URL contains `eightfold.ai`. Use `eightfold` parser.
-- **Oracle HCM**: URL contains `fa.oraclecloud.com`. Use `oracle_hcm` parser.
-- **Greenhouse**: URL contains `boards.greenhouse.io`. Create parser or use `generic`.
-- **Lever**: URL contains `jobs.lever.co`. Create parser or use `generic`.
-- **Other**: Start with `generic` parser. If it fails, create a custom parser.
+| Parser | Platform | Config Keys | Companies Using It |
+|--------|----------|-------------|-------------------|
+| `workday` | Workday API (`*.wd{N}.myworkdayjobs.com`) | `workday_url`, `search_text`, `limit`, `applied_facets` | Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, + others |
+| `phenom` | Phenom (`phApp.ddo`) via Playwright | `wait_ms` | Abbott, Qualtrics, Lowes, HPE |
+| `jibe` | Google Jibe (`/api/jobs` JSON) | `jibe_base_url`, `search_text`, `location` | DocuSign |
+| `eightfold` | Eightfold.ai API | `eightfold_domain`, `eightfold_company_domain`, `search_text`, `search_location` | Various |
+| `walmart` | Walmart GraphQL API | `search_text`, `populations` | Walmart |
+| `generic` | HTML + browser fallback | `wait_ms` | Fallback for unknown sites |
+| `oracle_hcm` | Oracle HCM Cloud | `wait_ms` | Oracle |
+| `salesforce` | Custom | - | Salesforce |
+| `spotify` | Custom API | `categories`, `search_location` | Spotify |
+| `stripe` | Custom (HTML table) | - | Stripe |
+| `uber` | Custom API | - | Uber |
+| `databricks` | Custom | - | Databricks |
+| `microsoft` | Custom | `search_text` | Microsoft |
+| `meta` | Custom | - | Meta |
+| `airbnb` | Custom | - | Airbnb |
+| `apple` | Custom | - | Apple |
+| `caterpillar` | Custom | - | Caterpillar |
+| `visa` | Custom | `wait_ms` | Visa |
+| `paypal` | Custom | - | PayPal |
+| `ford` | Custom | - | Ford |
 
-### Step 3: Try the generic parser first
-
-Add to `config.yaml`:
+## Config Keys Reference
 
 ```yaml
-  - name: CompanyName
-    enabled: true
-    parser: generic
-    url: "the career page URL"
-    wait_ms: 8000
-    target_titles:
-      - "Software Engineer"
+- name: CompanyName        # Display name
+  enabled: true            # Skip if false
+  parser: workday          # Parser from registry
+  url: "..."               # Career page URL (for reference)
+  search_text: "software"  # Search query (parser-specific)
+  target_titles:           # Case-insensitive substring match on job title
+    - "Software Engineer"
+  target_locations:        # Case-insensitive substring match on job location (optional)
+    - "United States of America"
+  # Parser-specific:
+  workday_url: "..."       # Workday API endpoint
+  limit: 20                # Workday page size
+  applied_facets:          # Workday facets (locationCountry, locations, etc.)
+    locationCountry: ["id"]
+  wait_ms: 8000            # Playwright wait (phenom, generic, oracle_hcm, visa)
+  jibe_base_url: "..."     # Jibe base URL
+  location: "United States" # Jibe location filter
 ```
 
-Run `python main.py --once` and check if it finds jobs. If it does, you're done.
+## Pipeline Flow
 
-### Step 4: Create a custom parser (if generic fails)
+1. `_crawl_site()` → parser.fetch_and_parse() → filter_by_keywords() → target_locations filter → storage.add_jobs()
+2. Returns `(CrawlSiteResult, new_jobs)` tuple
+3. `crawl_once()` runs all sites in parallel via ThreadPoolExecutor, sends email for new jobs, returns `List[CrawlSiteResult]`
+4. `main()` runs scheduled loop with cycle counter; sends health report every N cycles (default 10)
 
-Create `crawler/parsers/companyname.py`:
+## Adding a New Site
 
-```python
-import re
-import logging
-from typing import List
-from crawler.parser_base import ParserBase, JobPosting
+1. **Fetch the page** — check for platform indicators: `phApp`/`phenom`, `*.wd{N}.myworkdayjobs.com`, `eightfold`, `jibe`/`data-jibe`, `__NEXT_DATA__`
+2. **Match to existing parser** — Workday API, Phenom browser, Jibe /api/jobs, etc.
+3. **Test the API** before configuring:
+   - Workday: `POST https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{site}/jobs` with `{"searchText":"...","limit":20,"offset":0,"appliedFacets":{}}`
+   - Jibe: `GET https://{domain}/api/jobs?keywords=...&page=1`
+   - Phenom: Browser render, extract `window.phApp.ddo.eagerLoadRefineSearch`
+4. **Add to config.yaml**, **register in main.py** (if new parser), **update Career Links.xlsx**
+5. **Test**: `.venv/bin/python3 -c "..."` with parser class directly
 
-logger = logging.getLogger(__name__)
+## Workday URL Pattern
 
-class CompanyNameParser(ParserBase):
-    def fetch_and_parse(self) -> List[JobPosting]:
-        # Implement fetching and parsing logic
-        # Return self.filter_by_title(jobs) at the end
-        pass
-```
+- Public URL: `https://{co}.wd{N}.myworkdayjobs.com/{SiteID}/job/...`
+- API URL: `https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{SiteID}/jobs`
+- Parser auto-converts API paths to public URLs (strips `/wday/cxs/{co}`)
+- `applied_facets` supports `locationCountry`, `locations`, etc.
 
-Then register it in `main.py`:
+## Health Report System
 
-```python
-from crawler.parsers.companyname import CompanyNameParser
+- `CrawlSiteResult` tracks per-site success/failure, jobs found, new jobs added
+- `crawl_once()` returns results list; `main()` triggers report every N cycles
+- `send_health_report()` sends HTML email (summary + per-site table + parser health bars) or falls back to console logging
+- `get_jobs_added_today_count()` reads "Added On" column from jobs.xlsx
 
-PARSER_REGISTRY = {
-    # ... existing parsers ...
-    "companyname": CompanyNameParser,
-}
-```
+## Common Issues
 
-### Step 5: Update Career Links.xlsx
-
-Set column C (Status) for the new site:
-- `Working` - parser returns jobs successfully
-- `Not Working` - parser exists but site blocks scraping
-- `Not Configured` - no parser set up yet
-
-### Step 6: Update config.yaml
-
-Add the site entry with appropriate parser, URL, and target_titles.
-
-## API Investigation Patterns
-
-When probing a new site for APIs:
-
-```python
-# 1. Check for Workday API
-requests.post("https://company.wd5.myworkdayjobs.com/wday/cxs/company/external/jobs",
-    json={"searchText": "Software", "limit": 5, "offset": 0})
-
-# 2. Check for Eightfold API
-requests.get("https://company.eightfold.ai/api/apply/v2/jobs",
-    params={"domain": "company.com", "query": "Software", "num": 5})
-
-# 3. Check for __NEXT_DATA__ (Next.js sites)
-# Look for <script id="__NEXT_DATA__"> in page source
-
-# 4. Intercept API calls with Playwright
-def handle_response(response):
-    if "api" in response.url and response.status == 200:
-        print(response.url, response.json())
-page.on("response", handle_response)
-
-# 5. Check for embedded JSON in scripts
-# Look for patterns like phApp.ddo, window.__DATA__, data-sjs attributes
-```
-
-## Common Fixes
-
-- **0 jobs found**: Site may need browser rendering. Add `wait_ms: 8000` to config.
-- **403 errors**: Site has bot protection. Try browser rendering via `generic` parser.
-- **Wrong titles filtered**: Check `target_titles` in config. The filter is case-insensitive substring match.
-- **Duplicate jobs**: Dedup is based on `title|job_id` key. If titles change slightly, duplicates may appear.
-
-## Testing
-
-```bash
-# Run single site
-python3 -c "
-import yaml
-from crawler.parsers.generic import GenericHTMLParser
-with open('config.yaml') as f:
-    config = yaml.safe_load(f)
-site = [s for s in config['sites'] if s['name'] == 'CompanyName'][0]
-parser = GenericHTMLParser(site)
-jobs = parser.fetch_and_parse()
-for j in jobs[:5]:
-    print(f'{j.title} | {j.location} | {j.url}')
-"
-```
+- **0 jobs**: Try `wait_ms: 8000` or browser rendering; check if API endpoint changed
+- **403**: Bot protection — use browser rendering via `generic` or Playwright-based parser
+- **Wrong titles**: `target_titles` is case-insensitive substring; use broad terms like "Software" for sites with non-standard titles (e.g. Intel)
+- **Global results**: Add `target_locations: ["United States of America"]` to filter by location
+- **Workday facets ignored**: Use `applied_facets` in config (passed to Workday API body)
