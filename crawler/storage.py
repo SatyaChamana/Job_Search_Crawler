@@ -1,5 +1,6 @@
 import os
 import logging
+import threading
 from datetime import datetime
 from typing import List
 
@@ -25,6 +26,7 @@ COLUMNS = [
 class ExcelStorage:
     def __init__(self, filepath: str = "jobs.xlsx"):
         self.filepath = filepath
+        self._lock = threading.Lock()
         self._ensure_file()
 
     def _ensure_file(self):
@@ -55,30 +57,44 @@ class ExcelStorage:
         return keys
 
     def add_jobs(self, jobs: List[JobPosting]) -> List[JobPosting]:
-        """Deduplicate and append new jobs. Returns list of newly added jobs."""
-        existing_keys = self.get_existing_dedup_keys()
-        new_jobs = [j for j in jobs if j.dedup_key not in existing_keys]
+        """Deduplicate and append new jobs. Thread-safe. Returns list of newly added jobs."""
+        with self._lock:
+            existing_keys = self.get_existing_dedup_keys()
+            new_jobs = [j for j in jobs if j.dedup_key not in existing_keys]
 
-        if not new_jobs:
-            logger.info("No new jobs to add.")
-            return []
+            if not new_jobs:
+                logger.info("No new jobs to add.")
+                return []
 
-        wb = load_workbook(self.filepath)
-        ws = wb.active
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            wb = load_workbook(self.filepath)
+            ws = wb.active
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        for job in new_jobs:
-            ws.append([
-                job.job_id,
-                job.requisition_id,
-                job.title,
-                job.company,
-                job.location,
-                job.date_posted,
-                job.url,
-                now,
-            ])
+            for job in new_jobs:
+                ws.append([
+                    job.job_id,
+                    job.requisition_id,
+                    job.title,
+                    job.company,
+                    job.location,
+                    job.date_posted,
+                    job.url,
+                    now,
+                ])
 
-        wb.save(self.filepath)
-        logger.info(f"Added {len(new_jobs)} new jobs to {self.filepath}")
-        return new_jobs
+            wb.save(self.filepath)
+            logger.info(f"Added {len(new_jobs)} new jobs to {self.filepath}")
+            return new_jobs
+
+    def get_jobs_added_today_count(self) -> int:
+        """Count jobs added today by checking the 'Added On' column (index 8)."""
+        today_prefix = datetime.now().strftime("%Y-%m-%d")
+        count = 0
+        with self._lock:
+            wb = load_workbook(self.filepath, read_only=True)
+            ws = wb.active
+            for row in ws.iter_rows(min_row=2, values_only=True):
+                if row and row[7] is not None and str(row[7]).startswith(today_prefix):
+                    count += 1
+            wb.close()
+        return count

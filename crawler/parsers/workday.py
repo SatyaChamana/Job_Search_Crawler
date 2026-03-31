@@ -43,7 +43,7 @@ class WorkdayParser(ParserBase):
                 "Content-Type": "application/json",
             },
             json={
-                "appliedFacets": {},
+                "appliedFacets": self.site_config.get("applied_facets", {}),
                 "limit": limit,
                 "offset": 0,
                 "searchText": search_text,
@@ -53,7 +53,10 @@ class WorkdayParser(ParserBase):
         response.raise_for_status()
         data = response.json()
 
-        base_url = api_url.rsplit("/jobs", 1)[0]
+        # Convert API URL to public URL: strip /wday/cxs/{company} from the path
+        # e.g. https://co.wd1.myworkdayjobs.com/wday/cxs/co/Ext/jobs -> https://co.wd1.myworkdayjobs.com/Ext
+        import re
+        base_url = re.sub(r"/wday/cxs/[^/]+", "", api_url.rsplit("/jobs", 1)[0])
         postings = data.get("jobPostings", [])
         jobs = []
 
