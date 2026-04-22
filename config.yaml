@@ -14,6 +14,13 @@ email:
 storage:
   excel_file: "jobs.xlsx"
 
+exclude_titles:
+  - "Manager"
+  - "Vice President"
+  - "Director"
+  - "Senior Director"
+  - "VP"
+
 sites:
   - name: Salesforce
     enabled: true
@@ -704,6 +711,164 @@ sites:
     applied_facets:
       locationCountry:
         - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: NVIDIA
+    enabled: true
+    parser: workday
+    url: "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?q=software"
+    workday_url: "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "US"
+
+  - name: NVIDIA
+    enabled: true
+    parser: workday
+    url: "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?q=data"
+    workday_url: "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+    target_locations:
+      - "US"
+
+  - name: Capital One
+    enabled: true
+    parser: workday
+    url: "https://capitalone.wd12.myworkdayjobs.com/Capital_One?q=software"
+    workday_url: "https://capitalone.wd12.myworkdayjobs.com/wday/cxs/capitalone/Capital_One/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: Capital One
+    enabled: true
+    parser: workday
+    url: "https://capitalone.wd12.myworkdayjobs.com/Capital_One?q=data"
+    workday_url: "https://capitalone.wd12.myworkdayjobs.com/wday/cxs/capitalone/Capital_One/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Discord
+    enabled: true
+    parser: greenhouse_api
+    url: "https://discord.com/jobs"
+    greenhouse_board: "discord"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Figma
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.figma.com/careers/"
+    greenhouse_board: "figma"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Reddit
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.redditinc.com/careers"
+    greenhouse_board: "reddit"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Roblox
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.roblox.com/"
+    greenhouse_board: "roblox"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Coinbase
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.coinbase.com/careers/positions"
+    greenhouse_board: "coinbase"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Box
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.box.com/"
+    greenhouse_board: "boxinc"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Palo Alto Networks
+    enabled: true
+    parser: radancy
+    url: "https://jobs.paloaltonetworks.com/en/search-jobs/software/United%20States/47263/1/2/6252001/39x76/-98x5/50/2"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Palo Alto Networks
+    enabled: true
+    parser: radancy
+    url: "https://jobs.paloaltonetworks.com/en/search-jobs/data/United%20States/47263/1/2/6252001/39x76/-98x5/50/2"
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Snowflake
+    enabled: true
+    parser: phenom
+    url: "https://careers.snowflake.com/us/en/search-results?keywords=software"
+    wait_ms: 8000
+    target_titles:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+
+  - name: Snowflake
+    enabled: true
+    parser: phenom
+    url: "https://careers.snowflake.com/us/en/search-results?keywords=data"
+    wait_ms: 8000
     target_titles:
       - "Software Engineer"
       - "Data Scientist"

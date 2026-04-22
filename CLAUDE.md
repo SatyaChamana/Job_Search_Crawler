@@ -1,6 +1,6 @@
 # Job Search Crawler
 
-Python crawler that scrapes career pages, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
+Python crawler that scrapes career pages from 30+ companies, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
 
 ## Architecture
 
@@ -19,30 +19,38 @@ Career Links.xlsx           # Master list: Col A=company, B=URL, C=status (Worki
 jobs.xlsx                   # Output: deduplicated job postings
 ```
 
-## Parser Registry (21 parsers)
+## Parser Registry (23 parsers)
 
+### Reusable Platform Parsers
 | Parser | Platform | Config Keys | Companies Using It |
 |--------|----------|-------------|-------------------|
-| `workday` | Workday API (`*.wd{N}.myworkdayjobs.com`) | `workday_url`, `search_text`, `limit`, `applied_facets` | Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, + others |
+| `workday` | Workday API (`*.wd{N}.myworkdayjobs.com`) | `workday_url`, `search_text`, `limit`, `applied_facets` | Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike |
 | `phenom` | Phenom (`phApp.ddo`) via Playwright | `wait_ms` | Abbott, Qualtrics, Lowes, HPE |
+| `eightfold` | Eightfold.ai API | `eightfold_domain`, `eightfold_company_domain`, `search_text`, `search_location` | Amex |
 | `jibe` | Google Jibe (`/api/jobs` JSON) | `jibe_base_url`, `search_text`, `location` | DocuSign |
-| `eightfold` | Eightfold.ai API | `eightfold_domain`, `eightfold_company_domain`, `search_text`, `search_location` | Various |
-| `walmart` | Walmart GraphQL API | `search_text`, `populations` | Walmart |
-| `generic` | HTML + browser fallback | `wait_ms` | Fallback for unknown sites |
-| `oracle_hcm` | Oracle HCM Cloud | `wait_ms` | Oracle |
-| `salesforce` | Custom | - | Salesforce |
-| `spotify` | Custom API | `categories`, `search_location` | Spotify |
-| `stripe` | Custom (HTML table) | - | Stripe |
-| `uber` | Custom API | - | Uber |
-| `databricks` | Custom | - | Databricks |
-| `microsoft` | Custom | `search_text` | Microsoft |
-| `meta` | Custom | - | Meta |
-| `airbnb` | Custom | - | Airbnb |
-| `apple` | Custom | - | Apple |
-| `caterpillar` | Custom | - | Caterpillar |
-| `visa` | Custom | `wait_ms` | Visa |
-| `paypal` | Custom | - | PayPal |
-| `ford` | Custom | - | Ford |
+| `radancy` | Radancy/TMP (static HTML, `.card.card-job`) | - | Wells Fargo, Chime |
+| `greenhouse` | Greenhouse (browser-rendered, `.job-search-results-card-body`) | `wait_ms` | Waymo, Zoom |
+| `greenhouse_api` | Greenhouse public boards API | `greenhouse_board` | Cloudflare |
+| `oracle_hcm` | Oracle HCM Cloud | `wait_ms` | JPMC, Oracle |
+| `generic` | HTML + browser fallback | `wait_ms` | Cisco, Goldman Sachs, DoorDash |
+
+### Company-Specific Parsers
+| Parser | Company | Notes |
+|--------|---------|-------|
+| `salesforce` | Salesforce | HTML parsing |
+| `airbnb` | Airbnb | HTML parsing |
+| `apple` | Apple | HTML parsing |
+| `caterpillar` | Caterpillar | HTML parsing |
+| `spotify` | Spotify | REST API (`categories`, `search_location`) |
+| `stripe` | Stripe | HTML table parsing |
+| `uber` | Uber | Custom API |
+| `databricks` | Databricks | Custom API |
+| `walmart` | Walmart | GraphQL API (`search_text`, `populations`) |
+| `microsoft` | Microsoft | Browser + API interception (`search_text`) |
+| `meta` | Meta | Browser + data-sjs parsing |
+| `visa` | Visa | Browser rendering (`wait_ms`) |
+| `paypal` | PayPal | Eightfold-based custom |
+| `ford` | Ford | Custom |
 
 ## Config Keys Reference
 
@@ -61,26 +69,30 @@ jobs.xlsx                   # Output: deduplicated job postings
   limit: 20                # Workday page size
   applied_facets:          # Workday facets (locationCountry, locations, etc.)
     locationCountry: ["id"]
-  wait_ms: 8000            # Playwright wait (phenom, generic, oracle_hcm, visa)
+  wait_ms: 8000            # Playwright wait (phenom, generic, oracle_hcm, visa, greenhouse)
   jibe_base_url: "..."     # Jibe base URL
   location: "United States" # Jibe location filter
+  greenhouse_board: "name" # Greenhouse boards API board name
 ```
 
 ## Pipeline Flow
 
-1. `_crawl_site()` → parser.fetch_and_parse() → filter_by_keywords() → target_locations filter → storage.add_jobs()
+1. `_crawl_site()` -> parser.fetch_and_parse() -> filter_by_keywords() -> target_locations filter -> storage.add_jobs()
 2. Returns `(CrawlSiteResult, new_jobs)` tuple
 3. `crawl_once()` runs all sites in parallel via ThreadPoolExecutor, sends email for new jobs, returns `List[CrawlSiteResult]`
 4. `main()` runs scheduled loop with cycle counter; sends health report every N cycles (default 10)
+5. Interim email sent if any sites exceed 2-min timeout while others have already found new jobs
 
 ## Adding a New Site
 
-1. **Fetch the page** — check for platform indicators: `phApp`/`phenom`, `*.wd{N}.myworkdayjobs.com`, `eightfold`, `jibe`/`data-jibe`, `__NEXT_DATA__`
-2. **Match to existing parser** — Workday API, Phenom browser, Jibe /api/jobs, etc.
+1. **Fetch the page** — check for platform indicators: `phApp`/`phenom`, `*.wd{N}.myworkdayjobs.com`, `eightfold`, `jibe`/`data-jibe`, `greenhouse`, `__NEXT_DATA__`
+2. **Match to existing parser** — Workday API, Phenom browser, Jibe /api/jobs, Radancy static HTML, Greenhouse browser/API, etc.
 3. **Test the API** before configuring:
    - Workday: `POST https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{site}/jobs` with `{"searchText":"...","limit":20,"offset":0,"appliedFacets":{}}`
    - Jibe: `GET https://{domain}/api/jobs?keywords=...&page=1`
+   - Greenhouse API: `GET https://boards-api.greenhouse.io/v1/boards/{board}/jobs`
    - Phenom: Browser render, extract `window.phApp.ddo.eagerLoadRefineSearch`
+   - Radancy: Static HTML, `.card.card-job` elements with `?page=` pagination
 4. **Add to config.yaml**, **register in main.py** (if new parser), **update Career Links.xlsx**
 5. **Test**: `.venv/bin/python3 -c "..."` with parser class directly
 
@@ -102,6 +114,8 @@ jobs.xlsx                   # Output: deduplicated job postings
 
 - **0 jobs**: Try `wait_ms: 8000` or browser rendering; check if API endpoint changed
 - **403**: Bot protection — use browser rendering via `generic` or Playwright-based parser
+- **202 empty response**: Site needs browser rendering (e.g. Greenhouse sites)
 - **Wrong titles**: `target_titles` is case-insensitive substring; use broad terms like "Software" for sites with non-standard titles (e.g. Intel)
 - **Global results**: Add `target_locations: ["United States of America"]` to filter by location
 - **Workday facets ignored**: Use `applied_facets` in config (passed to Workday API body)
+- **Radancy location wrong**: Parser uses SVG icon detection (`#map-marker`) to distinguish location from department

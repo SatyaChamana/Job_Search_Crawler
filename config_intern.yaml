@@ -1,0 +1,329 @@
+scheduler:
+  interval_min_minutes: 18
+  interval_max_minutes: 23
+  start_hour: 7
+  stop_hour: 23
+
+email:
+  smtp_server: smtp.gmail.com
+  smtp_port: 587
+  sender_email: satyajason143@gmail.com
+  sender_password: dtza kfdd xafw wjxj
+  recipient_email: thrishajawahar@gmail.com
+
+storage:
+  excel_file: "intern_jobs.xlsx"
+
+sites:
+  - name: Salesforce
+    enabled: true
+    parser: salesforce
+    url: "https://careers.salesforce.com/en/jobs/?search=Intern&country=United+States+of+America&pagesize=30#results"
+    target_titles:
+      - "Intern"
+
+  - name: Airbnb
+    enabled: true
+    parser: airbnb
+    url: "https://careers.airbnb.com/positions/?_search_input=intern"
+    target_titles:
+      - "Intern"
+
+  - name: Adobe
+    enabled: true
+    parser: workday
+    url: "https://careers.adobe.com/us/en/search-results?keywords=intern"
+    workday_url: "https://adobe.wd5.myworkdayjobs.com/wday/cxs/adobe/external_experienced/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Amex
+    enabled: true
+    parser: eightfold
+    url: "https://aexp.eightfold.ai/careers?pid=40032366&domain=aexp.com&sort_by=relevance&hl=en"
+    eightfold_domain: "aexp.eightfold.ai"
+    eightfold_company_domain: "aexp.com"
+    search_text: "intern"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Apple
+    enabled: true
+    parser: apple
+    url: "https://jobs.apple.com/en-us/search?search=Intern&sort=relevance&location=united-states-USA"
+    target_titles:
+      - "Intern"
+
+  - name: Cisco
+    enabled: true
+    parser: generic
+    url: "https://jobs.cisco.com/jobs/SearchJobs/intern?21178=%5B169482%5D&21178_format=6020&listFilterMode=1"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: Caterpillar
+    enabled: true
+    parser: caterpillar
+    url: "https://careers.caterpillar.com/en/jobs/?search=Intern&country=United+States+of+America#results"
+    target_titles:
+      - "Intern"
+
+  - name: Ford
+    enabled: true
+    parser: ford
+    url: "https://jobs.ford.com/careers?query=Intern&start=0&location=united+states&pid=563568451106238&sort_by=timestamp&filter_include_remote=1"
+    target_titles:
+      - "Intern"
+
+  - name: Meta
+    enabled: false
+    parser: meta
+    url: "https://www.metacareers.com/jobs?query=intern&is_leadership=0&offices[0]=United%20States"
+    target_titles:
+      - "Intern"
+
+  - name: PayPal
+    enabled: true
+    parser: paypal
+    url: "https://paypal.eightfold.ai/careers?query=intern&start=0&location=united+states&pid=274918569749&sort_by=timestamp&filter_include_remote=1"
+    target_titles:
+      - "Intern"
+
+  - name: Microsoft
+    enabled: false
+    parser: microsoft
+    url: "https://jobs.careers.microsoft.com/global/en/search?q=intern&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
+    search_text: "intern"
+    target_titles:
+      - "Intern"
+
+  - name: JPMC
+    enabled: true
+    parser: oracle_hcm
+    url: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs?keyword=Intern&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000289738&locationLevel=country&mode=location&selectedPostingDatesFacet=7&sortBy=POSTING_DATES_DESC"
+    wait_ms: 12000
+    target_titles:
+      - "Intern"
+
+  - name: Goldman Sachs
+    enabled: true
+    parser: generic
+    url: "https://higher.gs.com/results?LOCATION=Los%20Angeles|Newport%20Beach|San%20Francisco|Wilmington|Washington|Miami|West%20Palm%20Beach|Atlanta|Chicago|Boston|Detroit|Troy|Jersey%20City|Albany|New%20York|Philadelphia|Pittsburgh|Dallas|Houston|Richardson|Draper|Salt%20Lake%20City|Seattle&page=1&search=intern&sort=POSTED_DATE"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: DoorDash
+    enabled: true
+    parser: generic
+    url: "https://careersatdoordash.com/job-search/?keyword=intern&location=&spage=1"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: Visa
+    enabled: true
+    parser: visa
+    url: "https://corporate.visa.com/en/jobs/?q=intern&cities=Ashburn&cities=Atlanta&cities=Austin&cities=Bellevue&cities=Denver&cities=Foster%20City&cities=Highlands%20Ranch&cities=Lehi&cities=Los%20Angeles&cities=Mentor&cities=Miami&cities=New%20York&cities=San%20Francisco&cities=Washington&cities=Wilmington"
+    wait_ms: 10000
+    target_titles:
+      - "Intern"
+
+  - name: Spotify
+    enabled: true
+    parser: spotify
+    url: "https://www.lifeatspotify.com/jobs?c=backend&c=data&c=machine-learning&c=mobile&c=security&c=web"
+    categories: "backend,data,machine-learning,mobile,security,web"
+    search_location: "usa"
+    target_titles:
+      - "Intern"
+
+  - name: Stripe
+    enabled: true
+    parser: stripe
+    url: "https://stripe.com/jobs/search?query=intern&office_locations=North+America--Atlanta&office_locations=North+America--Chicago&office_locations=North+America--New+York&office_locations=North+America--San+Francisco+Bridge+HQ&office_locations=North+America--Seattle&office_locations=North+America--South+San+Francisco&office_locations=North+America--Washington+DC"
+    target_titles:
+      - "Intern"
+
+  - name: Uber
+    enabled: true
+    parser: uber
+    url: "https://www.uber.com/us/en/careers/list/?query=Intern&location=USA-California-San%20Francisco&location=USA-California-Los%20Angeles&location=USA-New%20York-New%20York&location=USA-Illinois-Chicago&location=USA-Washington-Seattle&location=USA-California-Sunnyvale&location=USA-Arizona-Phoenix&location=USA-Florida-Miami&location=USA-Massachusetts-Boston&location=USA-Tennessee-Nashville&location=USA-Colorado-Denver"
+    target_titles:
+      - "Intern"
+
+  - name: Databricks
+    enabled: true
+    parser: databricks
+    url: "https://www.databricks.com/company/careers/open-positions?department=Engineering&location=West%20Coast%20-%20United%20States"
+    target_titles:
+      - "Intern"
+
+  - name: Abbott
+    enabled: true
+    parser: phenom
+    url: "https://www.jobs.abbott/us/en/search-results?keywords=Intern"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: Walmart
+    enabled: true
+    parser: walmart
+    url: "https://careers.walmart.com/us/en/results?searchQuery=intern&careerareas=Technology"
+    search_text: "intern"
+    target_titles:
+      - "Intern"
+
+  - name: Autodesk
+    enabled: true
+    parser: workday
+    url: "https://autodesk.wd1.myworkdayjobs.com/Ext?q=intern&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://autodesk.wd1.myworkdayjobs.com/wday/cxs/autodesk/Ext/jobs"
+    search_text: "intern"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Intern"
+
+  - name: Zillow
+    enabled: true
+    parser: workday
+    url: "https://zillow.wd5.myworkdayjobs.com/Zillow_Group_External?q=intern"
+    workday_url: "https://zillow.wd5.myworkdayjobs.com/wday/cxs/zillow/Zillow_Group_External/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Qualtrics
+    enabled: true
+    parser: phenom
+    url: "https://www.qualtrics.com/careers/us/en/search-results?m=3&keywords=intern"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: DocuSign
+    enabled: true
+    parser: jibe
+    url: "https://careers.docusign.com/jobs?keywords=intern&sortBy=posted_date&page=1&descending=true"
+    jibe_base_url: "https://careers.docusign.com"
+    search_text: "intern"
+    location: "United States"
+    target_titles:
+      - "Intern"
+
+  - name: T-Mobile
+    enabled: true
+    parser: workday
+    url: "https://careers.t-mobile.com/jobs?keyword=intern&sort_by=update_date"
+    workday_url: "https://tmobile.wd1.myworkdayjobs.com/wday/cxs/tmobile/External/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Lowes
+    enabled: true
+    parser: phenom
+    url: "https://talent.lowes.com/us/en/search-results?keywords=intern&category=Technology"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: HPE
+    enabled: true
+    parser: phenom
+    url: "https://careers.hpe.com/us/en/search-results?keywords=intern"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "United States of America"
+
+  - name: Wells Fargo
+    enabled: true
+    parser: radancy
+    url: "https://www.wellsfargojobs.com/en/jobs/?search=intern&country=United+States+of+America"
+    target_titles:
+      - "Intern"
+
+  - name: Chime
+    enabled: true
+    parser: radancy
+    url: "https://careers.chime.com/en/jobs/?keyword=intern&pagesize=20"
+    target_titles:
+      - "Intern"
+
+  - name: Waymo
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.withwaymo.com/jobs/search?page=1&country_codes%5B%5D=US&query=intern"
+    target_titles:
+      - "Intern"
+
+  - name: Zoom
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.zoom.us/jobs/search?page=1&country_codes%5B%5D=US&query=intern"
+    target_titles:
+      - "Intern"
+
+  - name: Cloudflare
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.cloudflare.com/careers/jobs/?title=intern"
+    greenhouse_board: "cloudflare"
+    target_titles:
+      - "Intern"
+
+  - name: CrowdStrike
+    enabled: true
+    parser: workday
+    url: "https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers?q=intern&locationCountry=bc33aa3152ec42d4995f4791a106ed09"
+    workday_url: "https://crowdstrike.wd5.myworkdayjobs.com/wday/cxs/crowdstrike/crowdstrikecareers/jobs"
+    search_text: "intern"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Intern"
+
+  - name: Intel
+    enabled: true
+    parser: workday
+    url: "https://intel.wd1.myworkdayjobs.com/External?q=intern&locations=1e4a4eb3adf101b8aec18a77bf810dd0&locations=1e4a4eb3adf1018c4bf78f77bf8112d0&locations=1e4a4eb3adf10118b1dfe877bf8162d0&locations=1e4a4eb3adf101989587fd77bf8176d0&locations=da6b8032b879100204a63a809f6c0000&locations=1e4a4eb3adf10146fd5c5276bf81eece&locations=1e4a4eb3adf1011246675c76bf81f8ce&locations=1e4a4eb3adf1016541777876bf8111cf&locations=1e4a4eb3adf101fa2a777d76bf8116cf&locations=1e4a4eb3adf10129d05fe377bf815dd0"
+    workday_url: "https://intel.wd1.myworkdayjobs.com/wday/cxs/intel/External/jobs"
+    search_text: "intern"
+    limit: 20
+    applied_facets:
+      locations:
+        - "1e4a4eb3adf101b8aec18a77bf810dd0"
+        - "1e4a4eb3adf1018c4bf78f77bf8112d0"
+        - "1e4a4eb3adf10118b1dfe877bf8162d0"
+        - "1e4a4eb3adf101989587fd77bf8176d0"
+        - "da6b8032b879100204a63a809f6c0000"
+        - "1e4a4eb3adf10146fd5c5276bf81eece"
+        - "1e4a4eb3adf1011246675c76bf81f8ce"
+        - "1e4a4eb3adf1016541777876bf8111cf"
+        - "1e4a4eb3adf101fa2a777d76bf8116cf"
+        - "1e4a4eb3adf10129d05fe377bf815dd0"
+    target_titles:
+      - "Intern"
+
+  - name: Oracle
+    enabled: true
+    parser: oracle_hcm
+    url: "https://careers.oracle.com/en/sites/jobsearch/jobs?keyword=intern&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22&selectedPostingDatesFacet=7"
+    wait_ms: 12000
+    target_titles:
+      - "Intern"

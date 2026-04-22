@@ -87,6 +87,9 @@ def _crawl_site(parser, site_name, storage, site_config):
         target_locations = site_config.get("target_locations", [])
         if target_locations:
             jobs = [j for j in jobs if any(loc.lower() in j.location.lower() for loc in target_locations)]
+        exclude_titles = site_config.get("exclude_titles", [])
+        if exclude_titles:
+            jobs = [j for j in jobs if not any(ex.lower() in j.title.lower() for ex in exclude_titles)]
         new_jobs = storage.add_jobs(jobs)
         result = CrawlSiteResult(
             label=site_name,
@@ -123,6 +126,9 @@ def crawl_once(config: dict) -> list:
     all_results = []
     notified_keys = set()
 
+    # Merge global exclude_titles into each site config
+    global_exclude = config.get("exclude_titles", [])
+
     # Build list of (site_name, parser, site_config) for enabled sites
     tasks = []
     for site in sites:
@@ -139,6 +145,8 @@ def crawl_once(config: dict) -> list:
         site_name = site.get("name", "Unknown")
         search = site.get("search_text", "")
         label = f"{site_name} ({search})" if search else site_name
+        if global_exclude and "exclude_titles" not in site:
+            site["exclude_titles"] = global_exclude
         parser = parser_cls(site)
         tasks.append((label, parser, site))
 

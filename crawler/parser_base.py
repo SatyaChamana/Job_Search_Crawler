@@ -43,7 +43,8 @@ class ParserBase(ABC):
         pass
 
     def filter_by_title(self, jobs: List[JobPosting]) -> List[JobPosting]:
-        """Filter jobs by case-insensitive substring match against target_titles."""
+        """Filter jobs by case-insensitive substring match against target_titles,
+        then exclude jobs matching exclude_titles."""
         if not self.target_titles:
             return jobs
         filtered = []
@@ -53,4 +54,7 @@ class ParserBase(ABC):
                 if target.lower() in job_title_lower:
                     filtered.append(job)
                     break
+        exclude_titles = self.site_config.get("exclude_titles", [])
+        if exclude_titles:
+            filtered = [j for j in filtered if not any(ex.lower() in j.title.lower() for ex in exclude_titles)]
         return filtered
