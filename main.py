@@ -30,6 +30,8 @@ from crawler.parsers.jibe import JibeParser
 from crawler.parsers.radancy import RadancyParser
 from crawler.parsers.greenhouse import GreenhouseParser
 from crawler.parsers.greenhouse_api import GreenhouseAPIParser
+from crawler.parsers.amazon import AmazonParser
+from crawler.parsers.avature import AvatureParser
 from crawler.parser_base import CrawlSiteResult
 from crawler.storage import ExcelStorage
 from crawler.notifier import EmailNotifier
@@ -65,6 +67,8 @@ PARSER_REGISTRY = {
     "radancy": RadancyParser,
     "greenhouse": GreenhouseParser,
     "greenhouse_api": GreenhouseAPIParser,
+    "amazon": AmazonParser,
+    "avature": AvatureParser,
 }
 
 
@@ -87,6 +91,9 @@ def _crawl_site(parser, site_name, storage, site_config):
         target_locations = site_config.get("target_locations", [])
         if target_locations:
             jobs = [j for j in jobs if any(loc.lower() in j.location.lower() for loc in target_locations)]
+        exclude_locations = site_config.get("exclude_locations", [])
+        if exclude_locations:
+            jobs = [j for j in jobs if not any(loc.lower() in j.location.lower() for loc in exclude_locations)]
         exclude_titles = site_config.get("exclude_titles", [])
         if exclude_titles:
             jobs = [j for j in jobs if not any(ex.lower() in j.title.lower() for ex in exclude_titles)]

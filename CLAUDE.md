@@ -1,6 +1,6 @@
 # Job Search Crawler
 
-Python crawler that scrapes career pages from 30+ companies, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
+Python crawler that scrapes career pages from 47 companies, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
 
 ## Architecture
 
@@ -19,19 +19,20 @@ Career Links.xlsx           # Master list: Col A=company, B=URL, C=status (Worki
 jobs.xlsx                   # Output: deduplicated job postings
 ```
 
-## Parser Registry (23 parsers)
+## Parser Registry (25 parsers)
 
 ### Reusable Platform Parsers
 | Parser | Platform | Config Keys | Companies Using It |
 |--------|----------|-------------|-------------------|
-| `workday` | Workday API (`*.wd{N}.myworkdayjobs.com`) | `workday_url`, `search_text`, `limit`, `applied_facets` | Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike |
-| `phenom` | Phenom (`phApp.ddo`) via Playwright | `wait_ms` | Abbott, Qualtrics, Lowes, HPE |
+| `workday` | Workday API (`*.wd{N}.myworkdayjobs.com`) | `workday_url`, `search_text`, `limit`, `applied_facets` | Adobe, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike, NVIDIA (`wd5`, site `NVIDIAExternalCareerSite`), Capital One (`wd12`, site `Capital_One`), General Motors (`wd5`, site `Careers_GM`), Boeing (`wd1`, site `EXTERNAL_CAREERS`), Nordstrom (`wd501`, site `nordstrom_careers`), Expedia (`wd108`, site `search`) |
+| `phenom` | Phenom (`phApp.ddo`) via Playwright | `wait_ms` | Abbott, Qualtrics, Lowes, HPE, Snowflake |
 | `eightfold` | Eightfold.ai API | `eightfold_domain`, `eightfold_company_domain`, `search_text`, `search_location` | Amex |
 | `jibe` | Google Jibe (`/api/jobs` JSON) | `jibe_base_url`, `search_text`, `location` | DocuSign |
-| `radancy` | Radancy/TMP (static HTML, `.card.card-job`) | - | Wells Fargo, Chime |
-| `greenhouse` | Greenhouse (browser-rendered, `.job-search-results-card-body`) | `wait_ms` | Waymo, Zoom |
-| `greenhouse_api` | Greenhouse public boards API | `greenhouse_board` | Cloudflare |
+| `radancy` | Radancy/TMP (static HTML) | - | Wells Fargo, Chime (`.card.card-job` layout, `?page=`), Palo Alto Networks (`section29` layout, `&p=`), Disney, NetApp, Synopsys (`a[data-job-id]` layout, `&p=`) |
+| `greenhouse` | Greenhouse (browser-rendered, `.job-search-results-card-body`) | `wait_ms` | Waymo, Zoom, Etsy (Clinch Talent, same CSS class) |
+| `greenhouse_api` | Greenhouse public boards API | `greenhouse_board` | Cloudflare, Discord, Figma, Reddit, Roblox, Coinbase, Box (`boxinc`), MongoDB, Brex, Datadog, New York Times |
 | `oracle_hcm` | Oracle HCM Cloud | `wait_ms` | JPMC, Oracle |
+| `avature` | Avature ATS (static HTML) | - | Two Sigma, Bloomberg |
 | `generic` | HTML + browser fallback | `wait_ms` | Cisco, Goldman Sachs, DoorDash |
 
 ### Company-Specific Parsers
@@ -46,11 +47,12 @@ jobs.xlsx                   # Output: deduplicated job postings
 | `uber` | Uber | Custom API |
 | `databricks` | Databricks | Custom API |
 | `walmart` | Walmart | GraphQL API (`search_text`, `populations`) |
-| `microsoft` | Microsoft | Browser + API interception (`search_text`) |
+| `microsoft` | Microsoft | PCSX API (`search_text`, `search_location`, `limit`) |
 | `meta` | Meta | Browser + data-sjs parsing |
 | `visa` | Visa | Browser rendering (`wait_ms`) |
 | `paypal` | PayPal | Eightfold-based custom |
 | `ford` | Ford | Custom |
+| `amazon` | Amazon | JSON API (`search.json`, `search_text`, `search_location`, `limit`) |
 
 ## Config Keys Reference
 
@@ -85,16 +87,38 @@ jobs.xlsx                   # Output: deduplicated job postings
 
 ## Adding a New Site
 
-1. **Fetch the page** — check for platform indicators: `phApp`/`phenom`, `*.wd{N}.myworkdayjobs.com`, `eightfold`, `jibe`/`data-jibe`, `greenhouse`, `__NEXT_DATA__`
-2. **Match to existing parser** — Workday API, Phenom browser, Jibe /api/jobs, Radancy static HTML, Greenhouse browser/API, etc.
-3. **Test the API** before configuring:
-   - Workday: `POST https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{site}/jobs` with `{"searchText":"...","limit":20,"offset":0,"appliedFacets":{}}`
-   - Jibe: `GET https://{domain}/api/jobs?keywords=...&page=1`
-   - Greenhouse API: `GET https://boards-api.greenhouse.io/v1/boards/{board}/jobs`
-   - Phenom: Browser render, extract `window.phApp.ddo.eagerLoadRefineSearch`
-   - Radancy: Static HTML, `.card.card-job` elements with `?page=` pagination
-4. **Add to config.yaml**, **register in main.py** (if new parser), **update Career Links.xlsx**
-5. **Test**: `.venv/bin/python3 -c "..."` with parser class directly
+### Step 1: Identify the platform
+Use `WebFetch` on the career URL and look for these indicators:
+- **Phenom**: `phApp`, `phenom`, `cdn.phenompeople.com` in page source
+- **Workday**: URL contains `wd{N}.myworkdayjobs.com`, or page links to a Workday login
+- **Greenhouse**: `greenhouse.io` references, or try `GET https://boards-api.greenhouse.io/v1/boards/{company}/jobs`
+- **Radancy**: `tbcdn.talentbrew.com`, `.card.card-job` or `section29__search-results-li` elements
+- **Eightfold**: `eightfold.ai` in URL or source, `vscdn.net` CDN
+- **Jibe**: `data-jibe` attributes, `/api/jobs` endpoint
+- **Oracle HCM**: `*.fa.oraclecloud.com` URL
+
+### Step 2: Test the API before configuring
+- **Workday**: `POST https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{site}/jobs` with `{"searchText":"...","limit":20,"offset":0,"appliedFacets":{}}`. Finding the site ID is the hard part — check the career page source for `myworkdayjobs.com/{SiteID}` patterns, or look for Workday login links. Note: `applied_facets` IDs are site-specific; use `target_locations` if the standard US country ID (`bc33aa3152ec42d4995f4791a106ed09`) doesn't work.
+- **Greenhouse API**: `GET https://boards-api.greenhouse.io/v1/boards/{board}/jobs` — try company name, `{company}inc`, etc.
+- **Jibe**: `GET https://{domain}/api/jobs?keywords=...&page=1`
+- **Phenom**: Uses Playwright browser rendering. Just set `parser: phenom`, `wait_ms: 8000`, and test.
+- **Radancy**: Static HTML fetch. Supports two layouts: `.card.card-job` (pagination via `?page=`) and `section29__search-results-li` (pagination via `&p=`).
+
+### Step 3: Add to config.yaml
+Follow the existing dual-entry pattern (software search + data search) for each company. Use `target_locations` for companies returning global results.
+
+### Step 4: Test with the actual parser
+```bash
+.venv/bin/python3 -c "
+from crawler.parsers.{parser} import {ParserClass}
+p = {ParserClass}({...config dict...})
+jobs = p.fetch_and_parse()
+print(f'{len(jobs)} jobs')
+for j in jobs[:5]: print(f'  - {j.title} @ {j.location}')
+"
+```
+
+### Step 5: Update Career Links.xlsx (if available)
 
 ## Workday URL Pattern
 
@@ -102,6 +126,45 @@ jobs.xlsx                   # Output: deduplicated job postings
 - API URL: `https://{co}.wd{N}.myworkdayjobs.com/wday/cxs/{co}/{SiteID}/jobs`
 - Parser auto-converts API paths to public URLs (strips `/wday/cxs/{co}`)
 - `applied_facets` supports `locationCountry`, `locations`, etc.
+- **Finding the site ID is the hardest part.** The wd number and site ID vary per company and cannot be guessed easily. Best approach: use `WebFetch` on the company's careers page and look for `myworkdayjobs.com/{SiteID}` links or Workday login URLs (which reveal both wd number and site ID). Alternatively, brute-force common site IDs: `en-US`, `External`, `ExternalSite`, `Careers`, `{CompanyName}`, `{CompanyName}ExternalCareerSite`, `{CompanyName}_Careers`, `ExternalCareerSite`.
+- **Applied facets are site-specific.** The US location country ID `bc33aa3152ec42d4995f4791a106ed09` works for some sites (Autodesk, CrowdStrike, Intel) but causes 400 errors on others (NVIDIA). When facets fail, omit `applied_facets` and use `target_locations` instead.
+
+### Known Working Workday Configurations
+| Company | Host | Site ID | Notes |
+|---------|------|---------|-------|
+| Adobe | `adobe.wd5` | `external_experienced` | |
+| Autodesk | `autodesk.wd1` | `Ext` | US facet works |
+| Zillow | `zillow.wd5` | `Zillow_Group_External` | |
+| Intel | `intel.wd1` | `External` | Uses `locations` facets |
+| T-Mobile | `tmobile.wd1` | `External` | |
+| CrowdStrike | `crowdstrike.wd5` | `crowdstrikecareers` | US facet works |
+| NVIDIA | `nvidia.wd5` | `NVIDIAExternalCareerSite` | No facets, use `target_locations` |
+| Capital One | `capitalone.wd12` | `Capital_One` | Note: wd12 (unusual) |
+| General Motors | `generalmotors.wd5` | `Careers_GM` | Phenom frontend, Workday backend |
+| Boeing | `boeing.wd1` | `EXTERNAL_CAREERS` | Radancy/TMP frontend, Workday backend |
+| Nordstrom | `nordstrom.wd501` | `nordstrom_careers` | Note: wd501 (very unusual) |
+| Expedia | `expedia.wd108` | `search` | US facet works, uses "Software Development Engineer" titles |
+
+### Known Working Greenhouse Board Names
+| Company | Board Name | Notes |
+|---------|-----------|-------|
+| Cloudflare | `cloudflare` | |
+| Discord | `discord` | |
+| Figma | `figma` | |
+| Reddit | `reddit` | |
+| Roblox | `roblox` | |
+| Coinbase | `coinbase` | |
+| Box | `boxinc` | Note: not `box` |
+| MongoDB | `mongodb` | Global results, use `target_locations` |
+| Brex | `brex` | Global results, use `target_locations` |
+| Datadog | `datadog` | Global results, use `target_locations` (locations use "USA" not "United States") |
+| New York Times | `thenewyorktimes` | Note: not `nytimes` or `nyt` |
+
+### Radancy Layouts
+The radancy parser supports three HTML layouts:
+1. **Card layout** (Wells Fargo, Chime): `.card.card-job` elements, `?page=` pagination, location via SVG icon detection
+2. **Section29 layout** (Palo Alto Networks): `li.section29__search-results-li` elements, `&p=` pagination, `a[data-job-id]` for job IDs
+3. **Job-link layout** (Disney, NetApp): `#search-results-list a[data-job-id]` elements, `&p=` pagination, `.job-location` and `.job-date-posted` spans. Title in `h2` (Disney) or `h3` (NetApp).
 
 ## Health Report System
 
@@ -109,6 +172,27 @@ jobs.xlsx                   # Output: deduplicated job postings
 - `crawl_once()` returns results list; `main()` triggers report every N cycles
 - `send_health_report()` sends HTML email (summary + per-site table + parser health bars) or falls back to console logging
 - `get_jobs_added_today_count()` reads "Added On" column from jobs.xlsx
+
+## Companies Investigated but Not Yet Added (as of 2026-04-22)
+
+These companies were tested but couldn't be configured with existing parsers:
+| Company | Platform | Issue |
+|---------|----------|-------|
+| Tesla | Custom (`tesla.com/cua-api/apps/careers/state`) | Akamai Bot Manager blocks all automated access (curl, Playwright, curl_cffi, undetected-chromedriver). API exists and accepts `query`/`offset`/`count` but requires solved JS challenge cookie (`_abck`). Currently disabled. |
+| Netflix | Custom (`jobs.netflix.com`) | 403 on API, needs custom parser |
+| Amazon | Custom (`amazon.jobs/en/search.json`) | **Added** — custom `amazon` parser with JSON API |
+| EA | Avature (`avature.net`) | Can try with `avature` parser (untested) |
+| Google | Custom (`careers.google.com`) | Needs custom parser |
+| EA | Avature (`avature.net`) | Unsupported ATS, needs new parser |
+| ServiceNow | Unknown | 403 on careers page |
+| Qualcomm | Eightfold | Different API pattern than standard eightfold, returns 0 results |
+| Samsung | Unknown | Career page unreachable via fetch |
+| Intuit | Unknown | 429 rate limiting |
+| Palantir | Unknown | Workday site IDs not found |
+| Broadcom | Unknown | Workday 404s, may have moved platforms |
+| Notion | Greenhouse | Board returns 0 jobs (may not use public boards API) |
+| Plaid | Greenhouse | Board returns 0 jobs |
+| HashiCorp | Greenhouse | Board returns 0 jobs |
 
 ## Common Issues
 

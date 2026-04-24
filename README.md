@@ -1,6 +1,6 @@
 # Job Search Crawler
 
-Automated job search crawler that scrapes career pages from 30+ companies, deduplicates listings, saves them to Excel, sends email notifications for new jobs, and provides periodic health reports.
+Automated job search crawler that scrapes career pages from 47 companies, deduplicates listings, saves them to Excel, sends email notifications for new jobs, and provides periodic health reports.
 
 ## Quick Start
 
@@ -73,13 +73,13 @@ Job_Search_Crawler/
 │   ├── filter.py                # Keyword filter (post-processing)
 │   │
 │   └── parsers/                 # One parser per site/platform
-│       ├── workday.py           # Workday platform (Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike)
-│       ├── phenom.py            # Phenom platform (Abbott, Qualtrics, Lowes, HPE)
+│       ├── workday.py           # Workday platform (Adobe, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike, NVIDIA, Capital One)
+│       ├── phenom.py            # Phenom platform (Abbott, Qualtrics, Lowes, HPE, Snowflake)
 │       ├── eightfold.py         # Eightfold.ai platform (Amex)
 │       ├── jibe.py              # Google Jibe platform (DocuSign)
-│       ├── radancy.py           # Radancy/TMP platform (Wells Fargo, Chime)
+│       ├── radancy.py           # Radancy/TMP platform (Wells Fargo, Chime, Palo Alto Networks)
 │       ├── greenhouse.py        # Greenhouse browser-rendered (Waymo, Zoom)
-│       ├── greenhouse_api.py    # Greenhouse public boards API (Cloudflare)
+│       ├── greenhouse_api.py    # Greenhouse public boards API (Cloudflare, Discord, Figma, Reddit, Roblox, Coinbase, Box)
 │       ├── oracle_hcm.py        # Oracle HCM Cloud (JPMC, Oracle)
 │       ├── generic.py           # Generic parser with HTML + browser fallback
 │       ├── salesforce.py        # Salesforce
@@ -91,11 +91,13 @@ Job_Search_Crawler/
 │       ├── uber.py              # Uber
 │       ├── databricks.py        # Databricks
 │       ├── walmart.py           # Walmart (GraphQL API)
-│       ├── microsoft.py         # Microsoft
+│       ├── microsoft.py         # Microsoft (PCSX API, no browser needed)
 │       ├── meta.py              # Meta
 │       ├── visa.py              # Visa
 │       ├── paypal.py            # PayPal
-│       └── ford.py              # Ford
+│       ├── ford.py              # Ford
+│       ├── amazon.py            # Amazon (JSON API)
+│       └── avature.py           # Avature ATS (Two Sigma)
 │
 ├── CLAUDE.md                    # Instructions for Claude Code AI assistant
 └── .gitignore
@@ -107,7 +109,7 @@ Job_Search_Crawler/
 main.py
   ├── Reads config.yaml
   ├── For each enabled site (in parallel via ThreadPoolExecutor):
-  │     ├── Picks parser from PARSER_REGISTRY (23 parsers)
+  │     ├── Picks parser from PARSER_REGISTRY
   │     ├── Parser fetches jobs (API / HTML / Browser — depends on platform)
   │     ├── Filters by target_titles (case-insensitive substring match)
   │     ├── Filters by target_locations (optional, case-insensitive substring)
@@ -122,16 +124,17 @@ main.py
 
 | Platform | Parser | Companies |
 |----------|--------|-----------|
-| Workday | `workday` | Adobe, Netflix, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike |
-| Phenom | `phenom` | Abbott, Qualtrics, Lowes, HPE |
+| Workday | `workday` | Adobe, Autodesk, Zillow, Intel, T-Mobile, CrowdStrike, NVIDIA, Capital One, General Motors, Boeing, Nordstrom, Expedia |
+| Phenom | `phenom` | Abbott, Qualtrics, Lowes, HPE, Snowflake |
 | Eightfold | `eightfold` | Amex |
 | Google Jibe | `jibe` | DocuSign |
-| Radancy/TMP | `radancy` | Wells Fargo, Chime |
-| Greenhouse (browser) | `greenhouse` | Waymo, Zoom |
-| Greenhouse (API) | `greenhouse_api` | Cloudflare |
+| Radancy/TMP | `radancy` | Wells Fargo, Chime, Palo Alto Networks, Disney, NetApp, Synopsys |
+| Greenhouse (browser) | `greenhouse` | Waymo, Zoom, Etsy |
+| Greenhouse (API) | `greenhouse_api` | Cloudflare, Discord, Figma, Reddit, Roblox, Coinbase, Box, MongoDB, Brex, Datadog, New York Times |
 | Oracle HCM | `oracle_hcm` | JPMC, Oracle |
+| Avature | `avature` | Two Sigma, Bloomberg |
 | Generic (HTML/browser) | `generic` | Cisco, Goldman Sachs, DoorDash |
-| Custom | Various | Salesforce, Airbnb, Apple, Caterpillar, Spotify, Stripe, Uber, Databricks, Walmart, Microsoft, Meta, Visa, PayPal, Ford |
+| Custom | Various | Salesforce, Airbnb, Apple, Caterpillar, Spotify, Stripe, Uber, Databricks, Walmart, Microsoft, Meta, Visa, PayPal, Ford, Amazon |
 
 ## Configuration
 
@@ -205,22 +208,30 @@ health_report_interval: 10
 
 ## Adding a New Company
 
-1. Add a new entry to `config.yaml` under `sites:`
-2. For most sites, start with the `generic` parser:
+1. **Check the platform** — visit the careers page and look for indicators:
+   - URL has `wd{N}.myworkdayjobs.com` → use `workday` parser
+   - Page source has `phApp`/`phenom`/`cdn.phenompeople.com` → use `phenom` parser
+   - Page source has `tbcdn.talentbrew.com` or Radancy-style markup → use `radancy` parser
+   - Test `GET https://boards-api.greenhouse.io/v1/boards/{company}/jobs` → use `greenhouse_api` parser
+   - Page source has `eightfold` → use `eightfold` parser
+
+2. Add entries to `config.yaml` under `sites:` (follow the dual-entry pattern: one for "software", one for "data"):
 
 ```yaml
   - name: NewCompany
     enabled: true
-    parser: generic
-    url: "https://newcompany.com/careers?search=Software"
-    wait_ms: 8000
+    parser: greenhouse_api          # or workday, phenom, radancy, etc.
+    url: "https://newcompany.com/careers"
+    greenhouse_board: "newcompany"  # parser-specific config
     target_titles:
       - "Software Engineer"
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
 ```
 
 3. Run `python main.py --once` to test
-4. If the generic parser finds 0 jobs, check if the site uses a known platform (Workday, Phenom, Greenhouse, etc.) and switch to the appropriate parser
-5. Update `Career Links.xlsx` with the company name, URL, and status
+4. Update `Career Links.xlsx` with the company name, URL, and status
 
 ## CLI Options
 

@@ -35,7 +35,25 @@
       "WebFetch(domain:careers.samsung.com)",
       "WebFetch(domain:careers.roblox.com)",
       "WebFetch(domain:careers.snowflake.com)",
-      "WebFetch(domain:jobs.paloaltonetworks.com)"
+      "WebFetch(domain:jobs.paloaltonetworks.com)",
+      "WebFetch(domain:jobs.careers.microsoft.com)",
+      "WebFetch(domain:apply.careers.microsoft.com)",
+      "WebFetch(domain:www.tesla.com)",
+      "Bash(.venv/bin/pip install:*)",
+      "WebFetch(domain:www.amazon.jobs)",
+      "Bash(curl -s \"https://www.amazon.jobs/en/search.json?base_query=software+engineer&loc_query=United+States&offset=0&result_limit=3\" -H \"User-Agent: Mozilla/5.0\")",
+      "Bash(curl -s \"https://search-careers.gm.com/en/jobs/?search=software&country=United+States+of+America&pagesize=20#results\")",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/91.0.4472.124 Safari/537.36\" \"https://search-careers.gm.com/en/jobs/?search=software&country=United+States+of+America&pagesize=20\")",
+      "WebFetch(domain:search-careers.gm.com)",
+      "Bash(whois search-careers.gm.com)",
+      "WebSearch",
+      "WebFetch(domain:jobs.boeing.com)",
+      "WebFetch(domain:careers.nordstrom.com)",
+      "WebFetch(domain:careers.expediagroup.com)",
+      "WebFetch(domain:www.disneycareers.com)",
+      "WebFetch(domain:careers.twosigma.com)",
+      "WebFetch(domain:careers.etsy.com)",
+      "Bash(.venv/bin/python3 -c \":*)"
     ]
   }
 }

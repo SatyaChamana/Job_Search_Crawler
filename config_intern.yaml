@@ -94,14 +94,6 @@ sites:
     target_titles:
       - "Intern"
 
-  - name: Microsoft
-    enabled: false
-    parser: microsoft
-    url: "https://jobs.careers.microsoft.com/global/en/search?q=intern&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
-    search_text: "intern"
-    target_titles:
-      - "Intern"
-
   - name: JPMC
     enabled: true
     parser: oracle_hcm
@@ -325,5 +317,248 @@ sites:
     parser: oracle_hcm
     url: "https://careers.oracle.com/en/sites/jobsearch/jobs?keyword=intern&lastSelectedFacet=POSTING_DATES&location=United+States&locationId=300000000149325&mode=location&selectedFlexFieldsFacets=%22AttributeChar4%7CEmployee%7C%7CAttributeChar13%7CProfessional%22&selectedPostingDatesFacet=7"
     wait_ms: 12000
+    target_titles:
+      - "Intern"
+
+  - name: NVIDIA
+    enabled: true
+    parser: workday
+    url: "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?q=intern"
+    workday_url: "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "US"
+
+  - name: Capital One
+    enabled: true
+    parser: workday
+    url: "https://capitalone.wd12.myworkdayjobs.com/Capital_One?q=intern"
+    workday_url: "https://capitalone.wd12.myworkdayjobs.com/wday/cxs/capitalone/Capital_One/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Discord
+    enabled: true
+    parser: greenhouse_api
+    url: "https://discord.com/jobs"
+    greenhouse_board: "discord"
+    target_titles:
+      - "Intern"
+
+  - name: Figma
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.figma.com/careers/"
+    greenhouse_board: "figma"
+    target_titles:
+      - "Intern"
+
+  - name: Reddit
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.redditinc.com/careers"
+    greenhouse_board: "reddit"
+    target_titles:
+      - "Intern"
+
+  - name: Roblox
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.roblox.com/"
+    greenhouse_board: "roblox"
+    target_titles:
+      - "Intern"
+
+  - name: Coinbase
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.coinbase.com/careers/positions"
+    greenhouse_board: "coinbase"
+    target_titles:
+      - "Intern"
+
+  - name: Box
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.box.com/"
+    greenhouse_board: "boxinc"
+    target_titles:
+      - "Intern"
+
+  - name: Palo Alto Networks
+    enabled: true
+    parser: radancy
+    url: "https://jobs.paloaltonetworks.com/en/search-jobs/intern/United%20States/47263/1/2/6252001/39x76/-98x5/50/2"
+    target_titles:
+      - "Intern"
+
+  - name: Snowflake
+    enabled: true
+    parser: phenom
+    url: "https://careers.snowflake.com/us/en/search-results?keywords=intern"
+    wait_ms: 8000
+    target_titles:
+      - "Intern"
+
+  - name: Amazon
+    enabled: true
+    parser: amazon
+    url: "https://www.amazon.jobs/en/search?base_query=intern&loc_query=United+States"
+    search_text: "intern"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "USA"
+
+  - name: Microsoft
+    enabled: true
+    parser: microsoft
+    url: "https://jobs.careers.microsoft.com/global/en/search?q=intern&lc=United%20States&sort_by=timestamp"
+    search_text: "intern"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: General Motors
+    enabled: true
+    parser: workday
+    url: "https://search-careers.gm.com/en/jobs/?search=intern&country=United+States+of+America&pagesize=20"
+    workday_url: "https://generalmotors.wd5.myworkdayjobs.com/wday/cxs/generalmotors/Careers_GM/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Boeing
+    enabled: true
+    parser: workday
+    url: "https://jobs.boeing.com/search-jobs/intern"
+    workday_url: "https://boeing.wd1.myworkdayjobs.com/wday/cxs/boeing/EXTERNAL_CAREERS/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Nordstrom
+    enabled: true
+    parser: workday
+    url: "https://careers.nordstrom.com/jobs?keyword=intern&sort_by=create_date"
+    workday_url: "https://nordstrom.wd501.myworkdayjobs.com/wday/cxs/nordstrom/nordstrom_careers/jobs"
+    search_text: "intern"
+    limit: 20
+    target_titles:
+      - "Intern"
+
+  - name: Expedia
+    enabled: true
+    parser: workday
+    url: "https://careers.expediagroup.com/jobs/?keyword=intern"
+    workday_url: "https://expedia.wd108.myworkdayjobs.com/wday/cxs/expedia/search/jobs"
+    search_text: "intern"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Intern"
+
+  - name: Disney
+    enabled: true
+    parser: radancy
+    url: "https://www.disneycareers.com/en/search-jobs/intern/391/1"
+    target_titles:
+      - "Intern"
+
+  - name: MongoDB
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.mongodb.com/company/careers/teams/engineering"
+    greenhouse_board: "mongodb"
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "Seattle"
+      - "Austin"
+      - "San Francisco"
+      - "Chicago"
+
+  - name: Two Sigma
+    enabled: true
+    parser: avature
+    url: "https://careers.twosigma.com/careers/OpenRoles/intern?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Intern"
+
+  - name: Etsy
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.etsy.com/jobs/search?page=1&country_codes%5B%5D=US&query=intern"
+    target_titles:
+      - "Intern"
+
+  - name: Brex
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.brex.com/careers"
+    greenhouse_board: "brex"
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "United States"
+
+  - name: Datadog
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.datadoghq.com/all-jobs/?s=intern"
+    greenhouse_board: "datadog"
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "USA"
+      - "New York"
+
+  - name: New York Times
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.nytco.com/careers/job-listings/?department=technology&office=united-states"
+    greenhouse_board: "thenewyorktimes"
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "New York"
+      - "USA"
+
+  - name: Bloomberg
+    enabled: true
+    parser: avature
+    url: "https://bloomberg.avature.net/careers/SearchJobs/intern?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Intern"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "New Jersey"
+
+  - name: NetApp
+    enabled: true
+    parser: radancy
+    url: "https://careers.netapp.com/search-jobs/intern/United%20States?orgIds=27600&kt=1&alp=6252001&alt=2"
+    target_titles:
+      - "Intern"
+
+  - name: Synopsys
+    enabled: true
+    parser: radancy
+    url: "https://careers.synopsys.com/search-jobs/intern/United%20States/44408/1/2/6252001/39x76/-98x5/50/2"
     target_titles:
       - "Intern"

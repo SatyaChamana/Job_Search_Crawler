@@ -22,6 +22,33 @@ exclude_titles:
   - "VP"
 
 sites:
+  - name: Amazon
+    enabled: true
+    parser: amazon
+    url: "https://www.amazon.jobs/en/search?base_query=software+engineer&loc_query=United+States"
+    search_text: "software engineer"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "USA"
+
+  - name: Amazon
+    enabled: true
+    parser: amazon
+    url: "https://www.amazon.jobs/en/search?base_query=data&loc_query=United+States"
+    search_text: "data"
+    search_location: "United States"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "ML Engineer"
+    target_locations:
+      - "USA"
+
   - name: Salesforce
     enabled: true
     parser: salesforce
@@ -211,18 +238,22 @@ sites:
       - "ML Engineer"
 
   - name: Microsoft
-    enabled: false
+    enabled: true
     parser: microsoft
-    url: "https://jobs.careers.microsoft.com/global/en/search?q=SDE&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
-    search_text: "SDE"
+    url: "https://jobs.careers.microsoft.com/global/en/search?q=software+engineer&lc=United%20States&sort_by=timestamp"
+    search_text: "software engineer"
+    search_location: "United States"
+    limit: 20
     target_titles:
       - "Software Engineer"
 
   - name: Microsoft
-    enabled: false
+    enabled: true
     parser: microsoft
-    url: "https://jobs.careers.microsoft.com/global/en/search?q=data&lc=United%20States&l=en_us&pg=1&pgSz=20&o=Relevance&flt=true"
+    url: "https://jobs.careers.microsoft.com/global/en/search?q=data&lc=United%20States&sort_by=timestamp"
     search_text: "data"
+    search_location: "United States"
+    limit: 20
     target_titles:
       - "Data Scientist"
       - "Data Analyst"
@@ -236,6 +267,8 @@ sites:
     wait_ms: 12000
     target_titles:
       - "Software Engineer"
+    exclude_locations:
+      - "India"
 
   - name: JPMC
     enabled: true
@@ -247,6 +280,8 @@ sites:
       - "Data Analyst"
       - "Analyst"
       - "ML Engineer"
+    exclude_locations:
+      - "India"
 
   - name: Goldman Sachs
     enabled: true
@@ -943,4 +978,345 @@ sites:
       - "Data Scientist"
       - "Data Analyst"
       - "Analyst"
+      - "ML Engineer"
+
+  - name: General Motors
+    enabled: true
+    parser: workday
+    url: "https://search-careers.gm.com/en/jobs/?search=software&country=United+States+of+America&pagesize=20"
+    workday_url: "https://generalmotors.wd5.myworkdayjobs.com/wday/cxs/generalmotors/Careers_GM/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: General Motors
+    enabled: true
+    parser: workday
+    url: "https://search-careers.gm.com/en/jobs/?search=data&country=United+States+of+America&pagesize=20"
+    workday_url: "https://generalmotors.wd5.myworkdayjobs.com/wday/cxs/generalmotors/Careers_GM/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+
+  - name: Boeing
+    enabled: true
+    parser: workday
+    url: "https://jobs.boeing.com/search-jobs/software/United%20States/185/1/2/6252001/39x76/-98x5/50/2"
+    workday_url: "https://boeing.wd1.myworkdayjobs.com/wday/cxs/boeing/EXTERNAL_CAREERS/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: Boeing
+    enabled: true
+    parser: workday
+    url: "https://jobs.boeing.com/search-jobs/data/United%20States/185/1/2/6252001/39x76/-98x5/50/2"
+    workday_url: "https://boeing.wd1.myworkdayjobs.com/wday/cxs/boeing/EXTERNAL_CAREERS/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+
+  - name: Nordstrom
+    enabled: true
+    parser: workday
+    url: "https://careers.nordstrom.com/jobs?keyword=software&sort_by=create_date"
+    workday_url: "https://nordstrom.wd501.myworkdayjobs.com/wday/cxs/nordstrom/nordstrom_careers/jobs"
+    search_text: "software"
+    limit: 20
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: Nordstrom
+    enabled: true
+    parser: workday
+    url: "https://careers.nordstrom.com/jobs?keyword=data&sort_by=create_date"
+    workday_url: "https://nordstrom.wd501.myworkdayjobs.com/wday/cxs/nordstrom/nordstrom_careers/jobs"
+    search_text: "data"
+    limit: 20
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+
+  - name: Expedia
+    enabled: true
+    parser: workday
+    url: "https://careers.expediagroup.com/jobs/?keyword=software&&filter[country]=United+States"
+    workday_url: "https://expedia.wd108.myworkdayjobs.com/wday/cxs/expedia/search/jobs"
+    search_text: "software"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Software Development Engineer"
+    exclude_locations:
+      - "India"
+
+  - name: Expedia
+    enabled: true
+    parser: workday
+    url: "https://careers.expediagroup.com/jobs/?keyword=data&&filter[country]=United+States"
+    workday_url: "https://expedia.wd108.myworkdayjobs.com/wday/cxs/expedia/search/jobs"
+    search_text: "data"
+    limit: 20
+    applied_facets:
+      locationCountry:
+        - "bc33aa3152ec42d4995f4791a106ed09"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+    exclude_locations:
+      - "India"
+
+  - name: Disney
+    enabled: true
+    parser: radancy
+    url: "https://www.disneycareers.com/en/search-jobs/software/391/1"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: Disney
+    enabled: true
+    parser: radancy
+    url: "https://www.disneycareers.com/en/search-jobs/data/391/1"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+
+  - name: MongoDB
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.mongodb.com/company/careers/teams/engineering"
+    greenhouse_board: "mongodb"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "Seattle"
+      - "Austin"
+      - "San Francisco"
+      - "Chicago"
+
+  - name: MongoDB
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.mongodb.com/company/careers/teams/engineering"
+    greenhouse_board: "mongodb"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "Seattle"
+      - "Austin"
+      - "San Francisco"
+      - "Chicago"
+
+  - name: Two Sigma
+    enabled: true
+    parser: avature
+    url: "https://careers.twosigma.com/careers/OpenRoles/software?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Software Architect"
+
+  - name: Two Sigma
+    enabled: true
+    parser: avature
+    url: "https://careers.twosigma.com/careers/OpenRoles/data?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+
+  - name: Etsy
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.etsy.com/jobs/search?page=1&country_codes%5B%5D=US&query=software"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+      - "Machine Learning"
+
+  - name: Etsy
+    enabled: true
+    parser: greenhouse
+    url: "https://careers.etsy.com/jobs/search?page=1&country_codes%5B%5D=US&query=data"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+
+  - name: Brex
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.brex.com/careers?department=Engineering&country=United+States"
+    greenhouse_board: "brex"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "United States"
+
+  - name: Brex
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.brex.com/careers?department=Data&country=United+States"
+    greenhouse_board: "brex"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+    target_locations:
+      - "United States"
+
+  - name: Datadog
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.datadoghq.com/all-jobs/?s=software"
+    greenhouse_board: "datadog"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "USA"
+      - "New York"
+
+  - name: Datadog
+    enabled: true
+    parser: greenhouse_api
+    url: "https://careers.datadoghq.com/all-jobs/?s=data"
+    greenhouse_board: "datadog"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+    target_locations:
+      - "USA"
+      - "New York"
+
+  - name: New York Times
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.nytco.com/careers/job-listings/?department=technology&office=united-states"
+    greenhouse_board: "thenewyorktimes"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "New York"
+      - "USA"
+
+  - name: New York Times
+    enabled: true
+    parser: greenhouse_api
+    url: "https://www.nytco.com/careers/job-listings/?department=data-and-insights&office=united-states"
+    greenhouse_board: "thenewyorktimes"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+      - "Machine Learning"
+    target_locations:
+      - "New York"
+      - "USA"
+
+  - name: Bloomberg
+    enabled: true
+    parser: avature
+    url: "https://bloomberg.avature.net/careers/SearchJobs/software?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "New Jersey"
+
+  - name: Bloomberg
+    enabled: true
+    parser: avature
+    url: "https://bloomberg.avature.net/careers/SearchJobs/data?listFilterMode=1&jobRecordsPerPage=100"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+    target_locations:
+      - "United States"
+      - "New York"
+      - "New Jersey"
+
+  - name: NetApp
+    enabled: true
+    parser: radancy
+    url: "https://careers.netapp.com/search-jobs/software/United%20States?orgIds=27600&kt=1&alp=6252001&alt=2"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: NetApp
+    enabled: true
+    parser: radancy
+    url: "https://careers.netapp.com/search-jobs/data/United%20States?orgIds=27600&kt=1&alp=6252001&alt=2"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
+      - "ML Engineer"
+
+  - name: Synopsys
+    enabled: true
+    parser: radancy
+    url: "https://careers.synopsys.com/search-jobs/software/United%20States/44408/1/2/6252001/39x76/-98x5/50/2"
+    target_titles:
+      - "Software Engineer"
+      - "Software Developer"
+
+  - name: Synopsys
+    enabled: true
+    parser: radancy
+    url: "https://careers.synopsys.com/search-jobs/data/United%20States/44408/1/2/6252001/39x76/-98x5/50/2"
+    target_titles:
+      - "Data Scientist"
+      - "Data Analyst"
+      - "Data Engineer"
       - "ML Engineer"

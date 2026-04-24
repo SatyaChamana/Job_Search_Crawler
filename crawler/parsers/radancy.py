@@ -37,17 +37,21 @@ class RadancyParser(ParserBase):
             resp.raise_for_status()
             soup = BeautifulSoup(resp.text, "html.parser")
 
-            # Try classic .card.card-job layout first, then section29 layout
+            # Try classic .card.card-job layout, then section29, then generic a[data-job-id]
             cards = soup.select(".card.card-job")
             if cards:
                 new_jobs = self._parse_card_layout(cards, base_url, seen_ids)
             else:
                 items = soup.select("li.section29__search-results-li")
-                new_jobs = self._parse_section29_layout(items, base_url, seen_ids)
-                if not items:
-                    break
+                if items:
+                    new_jobs = self._parse_section29_layout(items, base_url, seen_ids)
+                else:
+                    job_links = soup.select("#search-results-list a[data-job-id]")
+                    if not job_links:
+                        break
+                    new_jobs = self._parse_job_link_layout(job_links, base_url, seen_ids)
 
-            if not new_jobs and not cards:
+            if not new_jobs:
                 break
 
             all_jobs.extend(new_jobs)
@@ -121,6 +125,33 @@ class RadancyParser(ParserBase):
                 location=location,
                 url=f"{base_url}{href}" if href.startswith("/") else href,
                 company=self.site_name,
+            ))
+        return jobs
+
+    def _parse_job_link_layout(self, job_links, base_url, seen_ids):
+        """Parse generic a[data-job-id] layout (Disney, NetApp)."""
+        jobs = []
+        for link in job_links:
+            job_id = link.get("data-job-id", "")
+            if not job_id or job_id in seen_ids:
+                continue
+            seen_ids.add(job_id)
+
+            title_el = link.select_one("h2") or link.select_one("h3")
+            title = title_el.get_text(strip=True) if title_el else ""
+            href = link.get("href", "")
+            loc_el = link.select_one(".job-location")
+            location = loc_el.get_text(strip=True) if loc_el else ""
+            date_el = link.select_one(".job-date-posted")
+            date_posted = date_el.get_text(strip=True) if date_el else ""
+
+            jobs.append(JobPosting(
+                job_id=job_id,
+                title=title,
+                location=location,
+                url=f"{base_url}{href}" if href.startswith("/") else href,
+                company=self.site_name,
+                date_posted=date_posted,
             ))
         return jobs
 
