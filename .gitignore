@@ -1,12 +1,30 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
-dist/
-build/
 .venv/
 venv/
+
+# Build output
+dist/
+build/
+frontend/dist/
+
+# Dependencies
+node_modules/
+
+# Data files
 jobs.xlsx
 *.xlsx
 !Career Links.xlsx
+
+# Environment
 .env
+backend/.env
+
+# Personal data
+master_resume.md
+
+# OS
+.DS_Store

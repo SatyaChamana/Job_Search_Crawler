@@ -33,7 +33,7 @@ from crawler.parsers.greenhouse_api import GreenhouseAPIParser
 from crawler.parsers.amazon import AmazonParser
 from crawler.parsers.avature import AvatureParser
 from crawler.parser_base import CrawlSiteResult
-from crawler.storage import ExcelStorage
+from crawler.storage import ExcelStorage, SupabaseStorage, DualStorage, HAS_SUPABASE
 from crawler.notifier import EmailNotifier
 from crawler.filter import filter_by_keywords
 
@@ -72,7 +72,7 @@ PARSER_REGISTRY = {
 }
 
 
-def load_config(path: str = "config.yaml") -> dict:
+def load_config(path: str = "config/config.yaml") -> dict:
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
@@ -121,11 +121,29 @@ def _crawl_site(parser, site_name, storage, site_config):
         return result, []
 
 
-def crawl_once(config: dict) -> list:
-    """Run a single crawl cycle across all enabled sites in parallel. Returns list of CrawlSiteResult."""
+def _build_storage(config: dict):
+    """Build storage backend: DualStorage if Supabase is configured, else ExcelStorage."""
     storage_cfg = config.get("storage", {})
     excel_file = storage_cfg.get("excel_file", "jobs.xlsx")
-    storage = ExcelStorage(filepath=excel_file)
+    excel = ExcelStorage(filepath=excel_file)
+
+    supabase_cfg = config.get("supabase", {})
+    supabase_url = supabase_cfg.get("url", "")
+    supabase_key = supabase_cfg.get("key", "")
+
+    if supabase_url and supabase_key and HAS_SUPABASE:
+        try:
+            sb = SupabaseStorage(supabase_url, supabase_key)
+            logger.info("Supabase storage enabled (dual-write mode)")
+            return DualStorage(excel, sb)
+        except Exception as e:
+            logger.warning(f"Supabase init failed, using Excel only: {e}")
+    return excel
+
+
+def crawl_once(config: dict) -> list:
+    """Run a single crawl cycle across all enabled sites in parallel. Returns list of CrawlSiteResult."""
+    storage = _build_storage(config)
     notifier = EmailNotifier(config)
 
     sites = config.get("sites", [])
@@ -229,7 +247,7 @@ def crawl_once(config: dict) -> list:
 def main():
     parser = argparse.ArgumentParser(description="Job Search Crawler")
     parser.add_argument("--once", action="store_true", help="Run a single crawl cycle and exit")
-    parser.add_argument("--config", default="config.yaml", help="Path to config file")
+    parser.add_argument("--config", default="config/config.yaml", help="Path to config file")
     args = parser.parse_args()
     config = load_config(args.config)
 

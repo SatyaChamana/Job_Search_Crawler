@@ -53,7 +53,14 @@
       "WebFetch(domain:www.disneycareers.com)",
       "WebFetch(domain:careers.twosigma.com)",
       "WebFetch(domain:careers.etsy.com)",
-      "Bash(.venv/bin/python3 -c \":*)"
+      "Bash(.venv/bin/python3 -c \":*)",
+      "Bash(git:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(docker --version)",
+      "Bash(docker compose:*)"
     ]
   }
 }

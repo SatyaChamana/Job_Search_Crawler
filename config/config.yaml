@@ -14,6 +14,11 @@ email:
 storage:
   excel_file: "jobs.xlsx"
 
+# Supabase config — fill in after creating your project at https://supabase.com
+supabase:
+  url: ""   # e.g. https://abc123.supabase.co
+  key: ""   # anon/public key from Settings > API
+
 exclude_titles:
   - "Manager"
   - "Vice President"

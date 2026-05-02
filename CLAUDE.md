@@ -1,22 +1,64 @@
 # Job Search Crawler
 
-Python crawler that scrapes career pages from 47 companies, saves to `jobs.xlsx` with dedup, sends email alerts for new jobs, and periodic health reports. Config in `config.yaml`. Uses `.venv/bin/python3`.
+Full-stack job search platform: Python crawler scrapes career pages from 47 companies, FastAPI backend serves data from Supabase, React frontend with resume/cover letter generation via NVIDIA Cloud LLM. Uses `.venv/bin/python3`.
 
 ## Architecture
 
 ```
-main.py                     # Entry point, PARSER_REGISTRY, _crawl_site(), crawl_once(), main()
-config.yaml                 # Sites, email, scheduler, health_report_interval
+config/
+  config.yaml               # Sites, email, scheduler, health_report_interval
+  config_intern.yaml         # Alternate config for intern positions
 crawler/
+  main.py                   # Entry point, PARSER_REGISTRY, _crawl_site(), crawl_once(), main()
+  __main__.py               # python -m crawler entry point
+  requirements.txt          # Crawler Python dependencies
+  Dockerfile                # Crawler container
   parser_base.py            # JobPosting, CrawlSiteResult dataclasses, ParserBase ABC
-  storage.py                # ExcelStorage (dedup via title|job_id, get_jobs_added_today_count)
+  storage.py                # ExcelStorage, SupabaseStorage, DualStorage
   notifier.py               # EmailNotifier (job alerts + send_health_report with HTML email)
   fetcher.py                # fetch_page(), fetch_json() for static HTTP
   browser.py                # fetch_rendered_html() via Playwright
   filter.py                 # filter_by_keywords() post-filter
   parsers/                  # One file per parser (see registry below)
-Career Links.xlsx           # Master list: Col A=company, B=URL, C=status (Working/Not Working/Not Configured)
-jobs.xlsx                   # Output: deduplicated job postings
+backend/
+  main.py                   # FastAPI app, CORS, router registration
+  config.py                 # Pydantic Settings (Supabase, NVIDIA API)
+  database.py               # Supabase client init
+  models.py                 # Pydantic response models
+  Dockerfile                # Backend container
+  requirements.txt          # Backend Python dependencies
+  .env.example              # Template for credentials
+  routers/
+    jobs.py                 # GET /api/jobs, /api/stats
+    generate.py             # POST /api/generate/*, /api/bulk-generate, master resume CRUD
+  services/
+    llm_client.py           # NVIDIA Cloud LLM (OpenAI-compatible)
+    job_scraper.py           # Scrape job descriptions (reuses crawler/fetcher + browser)
+    document_generator.py    # Orchestrator: scrape -> LLM -> PDF -> Supabase Storage
+    supabase_storage.py      # Upload/download from Supabase Storage
+  prompts/
+    resume.txt              # System prompt for resume tailoring
+    cover_letter.txt        # System prompt for cover letter generation
+frontend/
+  Dockerfile                # Node build -> nginx serve
+  nginx.conf                # Reverse proxy /api -> backend:8000
+  vite.config.ts            # Dev proxy + Tailwind
+  src/
+    App.tsx                 # Main layout with modals and toast system
+    api.ts                  # Centralized API client
+    types.ts                # TypeScript interfaces
+    components/             # JobTable, JobRow, SearchBar, Pagination, StatsBar,
+                            # Modal, Toast, Spinner, BulkActionBar,
+                            # PreviewModal, DescriptionModal, MasterResumeModal
+    hooks/useJobs.ts        # Data-fetching hook with search/filter/sort/pagination
+scripts/
+  schema.sql                # Supabase table definitions
+  migrate_excel_to_supabase.py  # One-time migration from Excel to Supabase
+  capture_locations.py      # Utility to analyze location formats across companies
+n8n/workflows/              # n8n workflow templates (bulk generate, daily auto-generate)
+docker-compose.yml          # Orchestrates backend, frontend, crawler, n8n
+Career Links.xlsx           # Master list: Col A=company, B=URL, C=status
+jobs.xlsx                   # Output: deduplicated job postings (gitignored)
 ```
 
 ## Parser Registry (25 parsers)
@@ -104,7 +146,7 @@ Use `WebFetch` on the career URL and look for these indicators:
 - **Phenom**: Uses Playwright browser rendering. Just set `parser: phenom`, `wait_ms: 8000`, and test.
 - **Radancy**: Static HTML fetch. Supports two layouts: `.card.card-job` (pagination via `?page=`) and `section29__search-results-li` (pagination via `&p=`).
 
-### Step 3: Add to config.yaml
+### Step 3: Add to config/config.yaml
 Follow the existing dual-entry pattern (software search + data search) for each company. Use `target_locations` for companies returning global results.
 
 ### Step 4: Test with the actual parser

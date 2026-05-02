@@ -89,7 +89,7 @@ def fetch_locations(site_config):
 
 
 def main():
-    with open("config.yaml") as f:
+    with open("config/config.yaml") as f:
         cfg = yaml.safe_load(f)
 
     sites = cfg.get("sites", [])

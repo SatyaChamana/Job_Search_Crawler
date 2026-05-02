@@ -1,0 +1,110 @@
+{
+  "name": "Daily Auto-Generate for New Jobs",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Daily 8am Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://backend:8000/api/jobs?page=1&per_page=200&sort_by=added_on&sort_dir=desc",
+        "options": {}
+      },
+      "id": "fetch-recent-jobs",
+      "name": "Fetch Recent Jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter to jobs added in last 24 hours\nconst cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();\nconst jobs = $input.first().json.jobs || [];\nconst recentIds = jobs\n  .filter(j => j.added_on >= cutoff)\n  .map(j => j.id);\n\nif (recentIds.length === 0) {\n  return [{ json: { skip: true, message: 'No new jobs in last 24h' } }];\n}\n\nreturn [{ json: { skip: false, job_ids: recentIds, doc_types: ['resume', 'cover_letter'] } }];"
+      },
+      "id": "filter-recent",
+      "name": "Filter Recent Jobs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.skip }}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "id": "check-skip",
+      "name": "Has New Jobs?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/api/bulk-generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ job_ids: $json.job_ids, doc_types: $json.doc_types }) }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "id": "bulk-generate",
+      "name": "Bulk Generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1250, 250]
+    },
+    {
+      "parameters": {},
+      "id": "no-op",
+      "name": "No New Jobs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    }
+  ],
+  "connections": {
+    "Daily 8am Trigger": {
+      "main": [
+        [{ "node": "Fetch Recent Jobs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Recent Jobs": {
+      "main": [
+        [{ "node": "Filter Recent Jobs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filter Recent Jobs": {
+      "main": [
+        [{ "node": "Has New Jobs?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Has New Jobs?": {
+      "main": [
+        [{ "node": "Bulk Generate", "type": "main", "index": 0 }],
+        [{ "node": "No New Jobs", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
