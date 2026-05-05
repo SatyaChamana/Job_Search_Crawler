@@ -56,7 +56,7 @@ Full-stack job search platform: Python crawler scrapes career pages from 47+ com
 ## Architecture
 
 ```
-                    :3000                    :8000
+                                        
 React (Vite) ──────────────> FastAPI Backend ──────────> Supabase (Postgres + Storage)
                                   │
                                   ├──────────> LLM (Ollama on HPC / NVIDIA Cloud / Anthropic)
@@ -65,7 +65,7 @@ React (Vite) ──────────────> FastAPI Backend ──�
 
 Crawler (Python) ──> Excel (jobs.xlsx) + Supabase (dual-write)
 
-n8n (:5678) ──> FastAPI (bulk generation webhooks)
+n8n ──> FastAPI (bulk generation webhooks)
 
 Docker Compose orchestrates: backend, frontend, crawler, n8n
 ```
