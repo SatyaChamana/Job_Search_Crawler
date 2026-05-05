@@ -38,8 +38,6 @@ export interface BulkJobResult {
   job_id: number;
   doc_type: string;
   success: boolean;
-  download_url: string | null;
-  cached: boolean;
   error: string | null;
 }
 

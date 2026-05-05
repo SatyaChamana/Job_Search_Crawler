@@ -60,7 +60,11 @@
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
       "Bash(docker --version)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(curl:*)",
+      "Bash(open /tmp/test_resume.pdf)",
+      "Bash(open /tmp/test_cover_letter.pdf)",
+      "Bash(grep -v '\\\\.py$\\\\|\\\\.ts$\\\\|\\\\.tsx$\\\\|\\\\.js$\\\\|\\\\.sql$')"
     ]
   }
 }

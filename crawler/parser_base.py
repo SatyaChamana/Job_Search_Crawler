@@ -12,6 +12,7 @@ class JobPosting:
     company: str
     date_posted: str = ""
     requisition_id: str = ""
+    description: str = ""
     keyword_matches: List[str] = field(default_factory=list)  # Phase 2 field
 
     @property

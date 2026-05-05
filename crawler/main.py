@@ -36,6 +36,7 @@ from crawler.parser_base import CrawlSiteResult
 from crawler.storage import ExcelStorage, SupabaseStorage, DualStorage, HAS_SUPABASE
 from crawler.notifier import EmailNotifier
 from crawler.filter import filter_by_keywords
+from crawler.scraper import scrape_job_description
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,6 +81,22 @@ def load_config(path: str = "config/config.yaml") -> dict:
 SITE_TIMEOUT = 120  # 2 minutes
 
 
+def _fetch_descriptions(jobs, supabase_storage):
+    """Fetch job descriptions for new jobs and update them in Supabase."""
+    for job in jobs:
+        try:
+            desc = scrape_job_description(job.url)
+            if desc and len(desc) > 100:
+                job.description = desc
+                # Update the row in Supabase
+                supabase_storage.client.table("jobs").update(
+                    {"description": desc}
+                ).eq("job_id", job.job_id).eq("title", job.title).execute()
+                logger.info(f"  Fetched JD for {job.company} - {job.title[:40]} ({len(desc)} chars)")
+        except Exception as e:
+            logger.debug(f"  Could not fetch JD for {job.url}: {e}")
+
+
 def _crawl_site(parser, site_name, storage, site_config):
     """Crawl a single site, filter, store to Excel. Returns (CrawlSiteResult, new_jobs)."""
     search_text = site_config.get("search_text", "")
@@ -98,6 +115,13 @@ def _crawl_site(parser, site_name, storage, site_config):
         if exclude_titles:
             jobs = [j for j in jobs if not any(ex.lower() in j.title.lower() for ex in exclude_titles)]
         new_jobs = storage.add_jobs(jobs)
+
+        # Fetch job descriptions for new jobs and update Supabase
+        if new_jobs and hasattr(storage, 'supabase') and storage.supabase:
+            _fetch_descriptions(new_jobs, storage.supabase)
+        elif new_jobs and isinstance(storage, SupabaseStorage):
+            _fetch_descriptions(new_jobs, storage)
+
         result = CrawlSiteResult(
             label=site_name,
             site_name=site_config.get("name", "Unknown"),

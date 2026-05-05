@@ -1,0 +1,140 @@
+<resume>
+  <header>
+    <name>Satya Chamana</name>
+    <contact>
+      <phone>616-426-7409</phone>
+      <email>satyachamana@gmail.com</email>
+      <location>Fremont, CA</location>
+      <linkedin>linkedin.com/in/satya-chamana</linkedin>
+      <portfolio>satyachamana.com</portfolio>
+      <github>github.com/SatyaChamana</github>
+    </contact>
+  </header>
+
+  <summary>
+    <bullet>Software Engineer with 8+ years of experience designing and delivering secure, scalable cloud-native applications and distributed microservices across healthcare, regulated, and enterprise domains.</bullet>
+    <bullet>Strong background in secure design principles, code review governance, and implementing layered security controls to ensure reliability, testability, and maintainability across cloud-native applications in financial services and regulated environments.</bullet>
+    <bullet>Experienced in collaborating with cross-functional teams, including product managers, compliance stakeholders, and business units, to translate user requirements into compliant, production-ready solutions aligned with mortgage operations and lending workflows.</bullet>
+    <bullet>Proven track record of increasing unit test coverage, enforcing coding standards, and improving system resilience through disciplined SDLC, TDD practices, and structured change management with minimal disruption during releases.</bullet>
+    <bullet>Adept at leveraging AI tools across the development lifecycle to enhance code quality, automate validation, and accelerate secure feature delivery while driving technical innovation and process improvements.</bullet>
+  </summary>
+
+  <skills>
+    <category name="Language/Scripting">JAVA, Python, JavaScript, Typescript, R, SAS, C#, C++, Go</category>
+    <category name="Backend Technologies">Spring Boot, Microservices, Hibernate, Junit, JPA, Django, FastAPI, Express, Node JS, Docker, Kubernetes, NumPy, Pandas, Matplotlib, TensorFlow</category>
+    <category name="Databases">CosmoDB, Mongo dB, Oracle, MySQL, PostgreSQL, DynamoDB, SQL Server</category>
+    <category name="Cloud">Azure (Data Factory, Databricks Synapse Analytics, Event Grid), AWS (Athena, Kinesis, Cloud Formation, Cloud Watch, SageMaker)</category>
+    <category name="Devops/Tools">CI/CD, PyTorch, GitHub, Docker, Airflow, Kafka, Spark, Jenkins, Github Actions, SonarQube, Databricks, Snowflake, WebLogic, Redis</category>
+    <category name="Web Technologies">HTML5, CSS3, Angular JS, Redux, React JS, jQuery, REST Api's, Bootstrap, D3.js, Material UI</category>
+    <category name="Project Management">Agile, Waterfall, Scrum, SDLC, JIRA</category>
+    <category name="Analytical Tools">Tableau, Power BI, SAS OnDemand, R Studio, Microsoft Office (Excel, Word, PowerPoint)</category>
+  </skills>
+
+  <certifications>
+    <item>SAS Certified Associate</item>
+    <item>Infosys certified Python developer</item>
+    <item>Infosys Certified React JS developer</item>
+    <item>Infosys Certified Agile developer</item>
+    <item>AI 501 Introduction to AI (Non-Degree GVSU Course)</item>
+    <item>AI 502 Generative AI (Non-Degree GVSU Course)</item>
+  </certifications>
+
+  <experience>
+    <job>
+      <title>Data Scientist (SDE)</title>
+      <company>Grand Valley State University (Kirchoff College of Nursing)</company>
+      <location>Grand Rapids, MI</location>
+      <dates>Sep 24 – Current</dates>
+      <bullets>
+        <bullet>Architected and executed the full migration of a legacy Microsoft Access database to a redesigned MySQL relational schema, reengineering data models, indexing strategies, and normalization logic, improving query performance by more than 70% and reducing projected platform replacement costs by 10,000$ while preserving institutional workflows.</bullet>
+        <bullet>Engineered full-stack analytics platforms using React JS, Next.js, and D3.js with Django and FastAPI backends, improving stakeholder KPI visibility and reducing manual reporting time by 40%.</bullet>
+        <bullet>Designed and implemented REST APIs with layered security controls including role-based access, JWT validation, and database-level constraints, reducing unauthorized data access risks by more than 50%.</bullet>
+        <bullet>Directed all data operations for the college, supervising a team of 4 across reporting, analytics, and database management, implementing documentation standards that reduced request turnaround and improved data quality by 45%.</bullet>
+      </bullets>
+    </job>
+
+    <job>
+      <title>Biostatistician Intern</title>
+      <company>Corewell Health</company>
+      <location>Grand Rapids, MI</location>
+      <dates>May 24 – Sep 24</dates>
+      <bullets>
+        <bullet>Debugged and patched a critical parsing flaw in the RISmed R package, contributing a merged PR to the global open-source repository that immediately improved data acquisition accuracy for 200+ internal researchers and the broader R community.</bullet>
+      </bullets>
+    </job>
+
+    <job>
+      <title>Data Analyst</title>
+      <company>Grand Valley State University (Charter Schools Office)</company>
+      <location>Grand Rapids, MI</location>
+      <dates>May 23 – Apr 24</dates>
+      <bullets>
+        <bullet>Automated the entire charter school performance reporting cycle integrating Google Maps API for geographic peer matching with R and Tableau, reducing manual efforts from 3 weeks to 2 days for 50+ schools influencing $2M+ funding allocation.</bullet>
+        <bullet>Designed and maintained a production-grade data pipeline with built-in validation, error handling, and monitoring, reducing data processing time by 30% while improving data accuracy by 25%, eliminating 15+ hours of weekly manual reconciliation.</bullet>
+      </bullets>
+    </job>
+
+    <job>
+      <title>Software Engineer (Analyst)</title>
+      <company>Deloitte</company>
+      <location>Hyderabad, India</location>
+      <dates>Feb 21 – Aug 22</dates>
+      <bullets>
+        <bullet>Elevated system reliability to 99.5% uptime by overhauling backend API architecture with Java Spring and Hibernate, implementing connection pooling, lazy loading, and caching strategies that reduced API latency by 25% and eliminated recurring timeout failures impacting 10,000+ daily active users.</bullet>
+        <bullet>Secured and streamlined deployment by implementing SSO authentication with AWS tokens with env-specific domains, cutting access-related support tickets by 30% and simplifying access control across dev, UAT, and production environments.</bullet>
+        <bullet>Led a frontend team of 5 engineers, proactively coordinating across design, backend, and QA to eliminate delivery bottlenecks, accelerating project timelines by 30% and reducing sprint overruns.</bullet>
+      </bullets>
+    </job>
+
+    <job>
+      <title>Senior Systems Engineer</title>
+      <company>Infosys</company>
+      <location>Hyderabad, India</location>
+      <dates>Feb 18 – Jan 21</dates>
+      <bullets>
+        <bullet>Built a library of 30+ reusable, responsive ReactJS components with Redux and modern CSS frameworks, developing interactive web tables that handled 10x larger datasets with sub-second render times, improving frontend scalability.</bullet>
+        <bullet>Established a comprehensive testing and error-handling framework across frontend (Enzyme) and backend (JUnit, Mockito, Powermockito), reducing production defects by 30% and saving an estimated 200+ engineering hours per quarter previously spent on hotfixes and emergency patches.</bullet>
+        <bullet>Profiled and re-engineered backend service layers using Java Spring MVC, with caching, pagination, query optimization across RESTful APIs, &amp; built CI/CD pipelines with Jenkins, Git, resulting in 99.5% deployment success rate across 30+ prod releases.</bullet>
+        <bullet>Designed a localStorage-driven state management layer in React JS with JSON serialization, expiry-based cache invalidation, ensuring seamless data persistence across a multi-step workflow and eliminating 100% of redundant data entry issues.</bullet>
+      </bullets>
+    </job>
+  </experience>
+
+  <education>
+    <degree>
+      <name>Master of Science in Data Science &amp; Analytics</name>
+      <institution>Grand Valley State University</institution>
+      <gpa>3.9/4.0</gpa>
+    </degree>
+    <degree>
+      <name>Bachelor of Technology in Mechanical Engineering</name>
+      <institution>Jawaharlal Nehru Technological University Kakinada</institution>
+      <gpa>8.1/10</gpa>
+    </degree>
+  </education>
+
+  <projects>
+    <project>
+      <name>AI Awareness Session</name>
+      <description>Delivered an executive-level presentation demystifying Generative AI, RAG, and Agentic AI systems for non-technical healthcare stakeholders.</description>
+    </project>
+    <project>
+      <name>Robust EEG Decoding</name>
+      <description>Developed a distributionally robust deep learning framework using Wasserstein Gradient Flow to improve EEG signal classification under noisy data conditions.</description>
+    </project>
+    <project>
+      <name>Polyp Identification System</name>
+      <description>Engineered a full-stack CNN-based colonoscopy video analysis tool enabling real-time polyp detection with interactive D3 visualizations.</description>
+    </project>
+    <project>
+      <name>DynamicDeepLearn</name>
+      <description>Designed an adaptable neural network architecture with dynamic layers and transfer learning benchmarks to optimize performance across image datasets.</description>
+    </project>
+  </projects>
+
+  <awards>
+    <item>Infosys MVP award</item>
+    <item>Infosys best team award</item>
+    <item>Dean's Scholarship at Grand Valley State University</item>
+  </awards>
+</resume>

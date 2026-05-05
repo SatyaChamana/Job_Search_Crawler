@@ -16,8 +16,8 @@ storage:
 
 # Supabase config — fill in after creating your project at https://supabase.com
 supabase:
-  url: ""   # e.g. https://abc123.supabase.co
-  key: ""   # anon/public key from Settings > API
+  url: "https://vhrwgibawzulqlxepety.supabase.co"
+  key: "sb_publishable_kn8HSqE35StV12VSsU7-WA_fwK15PBN"   # anon/public key from Settings > API
 
 exclude_titles:
   - "Manager"

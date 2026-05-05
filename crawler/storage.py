@@ -150,8 +150,9 @@ class SupabaseStorage:
                 return []
 
             now = datetime.now(timezone.utc).isoformat()
-            rows = [
-                {
+            rows = []
+            for job in new_jobs:
+                row = {
                     "job_id": job.job_id,
                     "requisition_id": job.requisition_id,
                     "title": job.title,
@@ -161,8 +162,9 @@ class SupabaseStorage:
                     "url": job.url,
                     "added_on": now,
                 }
-                for job in new_jobs
-            ]
+                if job.description:
+                    row["description"] = job.description
+                rows.append(row)
 
             # Insert in batches of 500
             for i in range(0, len(rows), 500):

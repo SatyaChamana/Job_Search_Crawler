@@ -1,6 +1,6 @@
 # Job Search Crawler
 
-Full-stack job search platform: Python crawler scrapes career pages from 47+ companies, FastAPI backend serves data from Supabase, React frontend displays jobs with AI-powered resume and cover letter generation via NVIDIA Cloud LLM.
+Full-stack job search platform: Python crawler scrapes career pages from 47+ companies, FastAPI backend serves data from Supabase, React frontend displays jobs with AI-powered resume and cover letter generation. Supports multiple LLM providers (Ollama on HPC, NVIDIA Cloud, Anthropic).
 
 ## Table of Contents
 
@@ -11,12 +11,18 @@ Full-stack job search platform: Python crawler scrapes career pages from 47+ com
   - [Prerequisites](#prerequisites)
   - [1. Clone and Install](#1-clone-and-install)
   - [2. Supabase Setup](#2-supabase-setup)
-  - [3. NVIDIA Cloud API Setup](#3-nvidia-cloud-api-setup)
+  - [3. LLM Provider Setup](#3-llm-provider-setup)
   - [4. Email Notifications (Optional)](#4-email-notifications-optional)
   - [5. Environment Variables](#5-environment-variables)
 - [Running Locally](#running-locally)
   - [Crawler Only](#crawler-only)
   - [Full Stack (Backend + Frontend)](#full-stack-backend--frontend)
+- [LLM Providers](#llm-providers)
+  - [Option A: Ollama on GVSU Clipper HPC (Recommended)](#option-a-ollama-on-gvsu-clipper-hpc-recommended)
+  - [Option B: NVIDIA Cloud API](#option-b-nvidia-cloud-api)
+  - [Option C: Anthropic API](#option-c-anthropic-api)
+  - [Option D: Local Ollama](#option-d-local-ollama)
+- [Resume Generation Flow](#resume-generation-flow)
 - [Running with Docker](#running-with-docker)
 - [n8n Workflow Automation](#n8n-workflow-automation)
 - [API Reference](#api-reference)
@@ -36,9 +42,10 @@ Full-stack job search platform: Python crawler scrapes career pages from 47+ com
 - **Deduplication** -- Same job is never added twice (matched by title + job ID)
 - **Dual Storage** -- Writes to both Excel (`jobs.xlsx`) and Supabase, with graceful fallback if Supabase is not configured
 - **React Dashboard** -- Browse, search, filter, and sort jobs with a modern UI
-- **AI Resume/Cover Letter Generation** -- Generates tailored resumes and cover letters using NVIDIA Cloud LLM (meta/llama-3.1-70b-instruct)
+- **AI Resume/Cover Letter Generation** -- XML-based pipeline: LLM cherry-picks bullets from master resume per JD, outputs formatted .docx (resumes) and PDF (cover letters)
+- **Multi-Provider LLM** -- Supports Ollama (HPC or local), NVIDIA Cloud, and Anthropic APIs
 - **Bulk Generation** -- Select multiple jobs and generate documents in batch
-- **PDF Download & Preview** -- View generated documents inline or download as PDF
+- **DOCX & PDF Output** -- Resumes as .docx (consistent formatting via JSON template), cover letters as PDF
 - **Job Description Scraping** -- Automatically scrapes full job descriptions; supports manual paste as fallback
 - **Email Notifications** -- Sends alerts for new jobs and periodic health reports
 - **Docker Compose** -- One-command deployment of all services
@@ -52,7 +59,7 @@ Full-stack job search platform: Python crawler scrapes career pages from 47+ com
                     :3000                    :8000
 React (Vite) ──────────────> FastAPI Backend ──────────> Supabase (Postgres + Storage)
                                   │
-                                  ├──────────> NVIDIA Cloud API (LLM)
+                                  ├──────────> LLM (Ollama on HPC / NVIDIA Cloud / Anthropic)
                                   │
                                   └──────────> crawler/ (job description scraping)
 
@@ -89,9 +96,10 @@ Job_Search_Crawler/
 │
 ├── backend/
 │   ├── main.py                  # FastAPI app, CORS, router registration
-│   ├── config.py                # Pydantic Settings (Supabase, NVIDIA)
+│   ├── config.py                # Pydantic Settings (Supabase, LLM providers)
 │   ├── database.py              # Supabase client init
 │   ├── models.py                # Pydantic response models
+│   ├── master_resume.JSON        # JSON structure template for resume output
 │   ├── requirements.txt         # Backend Python dependencies
 │   ├── Dockerfile               # Backend container
 │   ├── .env.example             # Template for credentials
@@ -99,12 +107,13 @@ Job_Search_Crawler/
 │   │   ├── jobs.py              # GET /api/jobs, /api/stats
 │   │   └── generate.py          # Document generation + bulk + master resume
 │   ├── services/
-│   │   ├── llm_client.py        # NVIDIA Cloud LLM (OpenAI-compatible)
+│   │   ├── llm_client.py        # Multi-provider LLM client (NVIDIA, Ollama, Anthropic)
 │   │   ├── job_scraper.py       # Scrape job descriptions
-│   │   ├── document_generator.py # Orchestrator: scrape -> LLM -> PDF -> upload
+│   │   ├── document_generator.py # Orchestrator: scrape -> LLM -> docx/pdf
+│   │   ├── pdf_formatter.py     # JSON -> .docx (resumes), text -> PDF (cover letters)
 │   │   └── supabase_storage.py  # Supabase Storage upload/download
 │   └── prompts/
-│       ├── resume.txt           # System prompt for resume generation
+│       ├── resume.txt           # System prompt for JSON-based resume generation
 │       └── cover_letter.txt     # System prompt for cover letter generation
 │
 ├── frontend/
@@ -130,6 +139,7 @@ Job_Search_Crawler/
 │   ├── bulk_generate.json       # Webhook-triggered bulk generation
 │   └── daily_auto_generate.json # Daily cron: new jobs -> auto-generate docs
 │
+├── master_resume.md             # Master resume with all bullet variants (LLM data source)
 ├── docker-compose.yml           # Orchestrates backend, frontend, crawler, n8n
 ├── Career Links.xlsx            # Master list of career URLs with status
 ├── jobs.xlsx                    # Output: deduplicated job postings (auto-created)
@@ -196,13 +206,9 @@ source .venv/bin/activate
 python scripts/migrate_excel_to_supabase.py
 ```
 
-### 3. NVIDIA Cloud API Setup
+### 3. LLM Provider Setup
 
-The AI document generation uses NVIDIA Cloud's free-tier LLM API (OpenAI-compatible):
-
-1. Sign up at [build.nvidia.com](https://build.nvidia.com)
-2. Go to any model page (e.g., meta/llama-3.1-70b-instruct) and click **Get API Key**
-3. Copy your API key
+The resume/cover letter generation supports multiple LLM providers. Set `LLM_PROVIDER` in `backend/.env` to one of: `ollama`, `nvidia`, or `anthropic`. See [LLM Providers](#llm-providers) below for detailed setup of each option.
 
 ### 4. Email Notifications (Optional)
 
@@ -237,7 +243,13 @@ Edit `backend/.env` with your credentials:
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-anon-key-here
+
+# Choose one LLM provider:
+LLM_PROVIDER=ollama                          # or nvidia, anthropic
+OLLAMA_BASE_URL=http://localhost:11434/v1     # default, works with HPC tunnel
+OLLAMA_MODEL=llama3.1:70b                    # or llama3.1 for 8B
 NVIDIA_API_KEY=your-nvidia-api-key-here
+ANTHROPIC_API_KEY=your-anthropic-api-key-here
 ```
 
 Also update the Supabase section in `config/config.yaml` (used by the crawler for dual-write):
@@ -300,6 +312,165 @@ The frontend dev server runs on `http://localhost:5173` and proxies `/api` reque
 4. Click **Resume** or **Cover Letter** to generate AI-tailored documents
 5. Use the **Master Resume** button (top right) to upload your resume -- the LLM uses it to tailor generated documents
 6. Select multiple jobs with checkboxes and use **Generate All Selected** for bulk generation
+
+---
+
+## LLM Providers
+
+Set `LLM_PROVIDER` in `backend/.env` to switch between providers.
+
+### Option A: Ollama on GVSU Clipper HPC (Recommended)
+
+Run Ollama on the university HPC cluster with H100 GPU acceleration, tunneled to your local machine. Best quality (70B model) at no API cost.
+
+#### One-Time Cluster Setup
+
+```bash
+# SSH into clipper (GVSU VPN required)
+ssh chamanve@clipper.gvsu.edu
+
+# Ollama is installed at /mnt/projects/chamanve_project/ollama/
+# Add to PATH permanently
+echo 'export PATH=/mnt/projects/chamanve_project/ollama/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### Starting Ollama (each session)
+
+You need **3 terminals**: one on the cluster, one for the SSH tunnel, one for local dev.
+
+**Terminal 1 -- Cluster (GPU node):**
+
+```bash
+# SSH into clipper
+ssh chamanve@clipper.gvsu.edu
+
+# Request an interactive GPU session (H100)
+srun --partition=gpu --gres=gpu:nvidia_h100_nvl:1 --cpus-per-task=8 --mem=64G --time=04:00:00 --pty bash
+
+# Set up Ollama environment (run after landing on GPU node)
+export OLLAMA_HOST=0.0.0.0:11434
+export OLLAMA_MODELS=/mnt/projects/chamanve_project/ollama/models
+
+# Verify GPU is available
+nvidia-smi
+
+# Start Ollama server
+ollama serve &
+sleep 5
+
+# Pull model (first time only -- ~40GB for 70B)
+ollama pull llama3.1:70b
+
+# Test it works
+ollama run llama3.1:70b "Say hello in one word"
+
+# Note the hostname (e.g., g050) -- needed for tunnel
+hostname
+```
+
+Keep this terminal open. Ollama stops when the session ends.
+
+**Terminal 2 -- Local Mac (SSH tunnel):**
+
+```bash
+# Replace g050 with the actual GPU hostname from above
+ssh -N -L 11434:g050.clipper.gvsu.edu:11434 chamanve@clipper.gvsu.edu
+```
+
+Keep this terminal open.
+
+**Terminal 3 -- Local Mac (verify tunnel):**
+
+```bash
+curl http://localhost:11434/v1/models
+# Should return: {"object":"list","data":[{"id":"llama3.1:70b",...}]}
+```
+
+**`backend/.env`:**
+
+```env
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434/v1
+OLLAMA_MODEL=llama3.1:70b
+```
+
+#### Available GPU Nodes
+
+| Nodes | GPU | VRAM | SLURM gres flag |
+|-------|-----|------|-----------------|
+| g050-g052 | NVIDIA H100 NVL | 94GB | `gpu:nvidia_h100_nvl:1` |
+| g001-g004 | Tesla V100S | 32GB | `gpu:tesla_v100s:1` |
+| g005, g007-g008 | Quadro RTX 8000 | 48GB | `gpu:quadro_rtx_8000:1` |
+
+Use H100 for `llama3.1:70b`. Any GPU node works for `llama3.1` (8B).
+
+### Option B: NVIDIA Cloud API
+
+No local GPU required. Uses NVIDIA's hosted inference (free tier available).
+
+1. Sign up at [build.nvidia.com](https://build.nvidia.com)
+2. Get an API key from any model page
+
+```env
+LLM_PROVIDER=nvidia
+NVIDIA_API_KEY=nvapi-...
+```
+
+### Option C: Anthropic API
+
+```env
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Option D: Local Ollama
+
+If you have a GPU on your local machine:
+
+```bash
+brew install ollama       # macOS
+ollama serve &
+ollama pull llama3.1
+```
+
+```env
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434/v1
+OLLAMA_MODEL=llama3.1
+```
+
+---
+
+## Resume Generation Flow
+
+```
+master_resume.md (all bullet variants)  ──┐
+                                          ├──> LLM ──> JSON response ──> .docx
+master_resume.json (structure template)  ──┘
+                                          ↑
+                                   Job Description
+```
+
+1. User clicks **Resume** in the frontend
+2. Backend scrapes the job description from the posting URL (or uses cached)
+3. `master_resume.md` (all bullet variants and summary angles) is sent as the data source
+4. `backend/master_resume.json` defines the JSON output structure
+5. LLM cherry-picks the best matching bullets per JD -- **no rewriting, only selection and reordering**
+6. JSON response is parsed and rendered as a `.docx` file using python-docx
+7. Cover letters are generated as plain text and rendered as PDF
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `master_resume.md` | All bullet variants, summary angles, complete skills inventory |
+| `backend/master_resume.json` | JSON structure template defining the output format |
+| `backend/prompts/resume.txt` | System prompt instructing LLM to cherry-pick from .md, output as JSON |
+| `backend/prompts/cover_letter.txt` | System prompt for cover letter generation |
+| `backend/services/document_generator.py` | Orchestrator: loads both files, calls LLM, formats output |
+| `backend/services/pdf_formatter.py` | `format_resume_docx()` (JSON to .docx) and `format_cover_letter_pdf()` |
+| `backend/services/llm_client.py` | Multi-provider client (NVIDIA, Ollama, Anthropic) |
 
 ---
 
@@ -549,7 +720,7 @@ Duplicates (same title + job ID) are automatically skipped.
 | Frontend | React 19, Vite 8, TypeScript 6, Tailwind CSS v4 |
 | Database | Supabase (PostgreSQL) |
 | File Storage | Supabase Storage |
-| LLM | NVIDIA Cloud API (meta/llama-3.1-70b-instruct) |
-| PDF Generation | fpdf2 |
+| LLM | Ollama (HPC/local), NVIDIA Cloud API, Anthropic API |
+| Document Generation | python-docx (.docx resumes), fpdf2 (PDF cover letters) |
 | Containers | Docker, Docker Compose |
 | Automation | n8n |

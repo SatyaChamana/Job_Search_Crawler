@@ -3,96 +3,82 @@
 import hashlib
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from pathlib import Path
 from typing import List
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from backend.database import supabase
-from backend.services.document_generator import generate_document, MASTER_RESUME_FILE
-from backend.services import supabase_storage
+from backend.services.document_generator import generate_document, MASTER_RESUME_MD
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-class GenerateResponse(BaseModel):
-    download_url: str
-    cached: bool
+class LLMProviderBody(BaseModel):
+    provider: str
 
 
-class GenerationStatus(BaseModel):
-    resume: dict | None = None
-    cover_letter: dict | None = None
+@router.get("/llm-provider")
+def get_llm_provider():
+    """Get the active LLM provider."""
+    from backend.config import settings
+    return {
+        "provider": settings.llm_provider,
+        "nvidia_model": settings.nvidia_model,
+        "ollama_model": settings.ollama_model,
+    }
+
+
+@router.put("/llm-provider")
+def set_llm_provider(body: LLMProviderBody):
+    """Switch between 'nvidia' and 'ollama'."""
+    from backend.config import settings
+    if body.provider not in ("nvidia", "ollama", "anthropic"):
+        raise HTTPException(status_code=400, detail="Provider must be 'nvidia', 'ollama', or 'anthropic'")
+    settings.llm_provider = body.provider
+    return {"provider": settings.llm_provider}
 
 
 class MasterResumeBody(BaseModel):
     content: str
 
 
-class BulkGenerateRequest(BaseModel):
-    job_ids: List[int]
-    doc_types: List[str] = ["resume", "cover_letter"]
-
-
-class BulkJobResult(BaseModel):
-    job_id: int
-    doc_type: str
-    success: bool
-    download_url: str | None = None
-    cached: bool = False
-    error: str | None = None
-
-
-class BulkGenerateResponse(BaseModel):
-    total: int
-    succeeded: int
-    failed: int
-    results: List[BulkJobResult]
-
-
-@router.post("/generate/resume/{job_id}", response_model=GenerateResponse)
+@router.post("/generate/resume/{job_id}")
 def generate_resume(job_id: int):
-    """Generate a tailored resume for a job posting."""
+    """Generate a tailored resume and return the docx directly."""
     try:
-        result = generate_document(job_id, "resume")
-        return GenerateResponse(**result)
+        file_bytes, filename = generate_document(job_id, "resume")
+        media_type = (
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            if filename.endswith(".docx")
+            else "application/pdf"
+        )
+        return Response(
+            content=file_bytes,
+            media_type=media_type,
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
     except Exception as e:
         logger.error(f"Resume generation failed for job {job_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/generate/cover-letter/{job_id}", response_model=GenerateResponse)
+@router.post("/generate/cover-letter/{job_id}")
 def generate_cover_letter(job_id: int):
-    """Generate a tailored cover letter for a job posting."""
+    """Generate a tailored cover letter and return the PDF directly."""
     try:
-        result = generate_document(job_id, "cover_letter")
-        return GenerateResponse(**result)
+        pdf_bytes, filename = generate_document(job_id, "cover_letter")
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
     except Exception as e:
         logger.error(f"Cover letter generation failed for job {job_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/generate/status/{job_id}", response_model=GenerationStatus)
-def generation_status(job_id: int):
-    """Check what documents have been generated for a job."""
-    result = (
-        supabase.table("generated_documents")
-        .select("doc_type, storage_path, created_at, llm_model")
-        .eq("job_id", job_id)
-        .execute()
-    )
-    status = GenerationStatus()
-    for row in result.data:
-        url = supabase_storage.get_signed_url(row["storage_path"])
-        info = {"generated": True, "url": url, "created_at": row["created_at"], "model": row["llm_model"]}
-        if row["doc_type"] == "resume":
-            status.resume = info
-        elif row["doc_type"] == "cover_letter":
-            status.cover_letter = info
-    return status
 
 
 @router.put("/master-resume")
@@ -104,7 +90,6 @@ def update_master_resume(body: MasterResumeBody):
 
     content_hash = hashlib.sha256(content.encode()).hexdigest()[:16]
 
-    # Check if identical content already exists
     existing = (
         supabase.table("master_resume")
         .select("id")
@@ -126,7 +111,6 @@ def update_master_resume(body: MasterResumeBody):
 @router.get("/master-resume")
 def get_master_resume():
     """Get the current master resume. Checks Supabase first, falls back to master_resume.md."""
-    # Try Supabase first
     try:
         result = (
             supabase.table("master_resume")
@@ -140,9 +124,8 @@ def get_master_resume():
     except Exception:
         pass
 
-    # Fall back to file
-    if MASTER_RESUME_FILE.exists():
-        content = MASTER_RESUME_FILE.read_text()
+    if MASTER_RESUME_MD.exists():
+        content = MASTER_RESUME_MD.read_text()
         content_hash = hashlib.sha256(content.encode()).hexdigest()[:16]
         return {"content": content, "content_hash": content_hash, "updated_at": None}
 
@@ -170,9 +153,47 @@ def get_job_description(job_id: int):
     return {"description": result.data.get("description") or ""}
 
 
+@router.post("/jobs/{job_id}/fetch-description")
+def fetch_job_description(job_id: int):
+    """Scrape the job description from the job's URL and cache it."""
+    from backend.services.job_scraper import scrape_job_description
+
+    result = supabase.table("jobs").select("url, description").eq("id", job_id).single().execute()
+    job = result.data
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    try:
+        desc = scrape_job_description(job["url"])
+        supabase.table("jobs").update({"description": desc}).eq("id", job_id).execute()
+        return {"description": desc}
+    except Exception as e:
+        logger.error(f"Failed to fetch description for job {job_id}: {e}")
+        raise HTTPException(status_code=502, detail=f"Could not scrape description: {e}")
+
+
+class BulkGenerateRequest(BaseModel):
+    job_ids: List[int]
+    doc_types: List[str] = ["resume", "cover_letter"]
+
+
+class BulkJobResult(BaseModel):
+    job_id: int
+    doc_type: str
+    success: bool
+    error: str | None = None
+
+
+class BulkGenerateResponse(BaseModel):
+    total: int
+    succeeded: int
+    failed: int
+    results: List[BulkJobResult]
+
+
 @router.post("/bulk-generate", response_model=BulkGenerateResponse)
 def bulk_generate(body: BulkGenerateRequest):
-    """Generate documents for multiple jobs in parallel. Designed for n8n webhook integration."""
+    """Generate documents for multiple jobs. PDFs are generated but not stored — use single endpoints to download."""
     if not body.job_ids:
         raise HTTPException(status_code=400, detail="job_ids cannot be empty")
     for dt in body.doc_types:
@@ -184,16 +205,11 @@ def bulk_generate(body: BulkGenerateRequest):
 
     def _run(job_id: int, doc_type: str) -> BulkJobResult:
         try:
-            res = generate_document(job_id, doc_type)
-            return BulkJobResult(
-                job_id=job_id, doc_type=doc_type, success=True,
-                download_url=res["download_url"], cached=res["cached"],
-            )
+            generate_document(job_id, doc_type)
+            return BulkJobResult(job_id=job_id, doc_type=doc_type, success=True)
         except Exception as e:
             logger.error(f"Bulk generate failed: job={job_id} type={doc_type}: {e}")
-            return BulkJobResult(
-                job_id=job_id, doc_type=doc_type, success=False, error=str(e),
-            )
+            return BulkJobResult(job_id=job_id, doc_type=doc_type, success=False, error=str(e))
 
     max_workers = min(len(tasks), 4)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

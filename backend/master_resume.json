@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "angle": "The chosen summary angle full paragraph text goes here",
+    "bullets": [
+      "Cherry-picked summary bullet 1",
+      "Cherry-picked summary bullet 2",
+      "Cherry-picked summary bullet 3",
+      "Cherry-picked summary bullet 4"
+    ]
+  },
+  "skills": [
+    {"name": "Category Name", "items": "skill1, skill2, skill3"},
+    {"name": "Category Name 2", "items": "skill4, skill5, skill6"}
+  ],
+  "experience": [
+    {
+      "title": "Data Scientist (SDE)",
+      "company": "Grand Valley State University (Kirkhof College of Nursing)",
+      "location": "Grand Rapids, MI",
+      "dates": "Sep 2024 - Present",
+      "bullets": ["bullet1", "bullet2", "bullet3", "bullet4", "bullet5"]
+    },
+    {
+      "title": "Biostatistician Intern",
+      "company": "Corewell Health",
+      "location": "Grand Rapids, MI",
+      "dates": "May 2024 - May 2025",
+      "bullets": ["bullet1", "bullet2", "bullet3", "bullet4"]
+    },
+    {
+      "title": "Data Analyst",
+      "company": "Grand Valley State University (Charter Schools Office)",
+      "location": "Grand Rapids, MI",
+      "dates": "May 2023 - Apr 2024",
+      "bullets": ["bullet1", "bullet2", "bullet3", "bullet4"]
+    },
+    {
+      "title": "Analyst (SDE)",
+      "company": "Deloitte India Offices of US",
+      "location": "Hyderabad, India",
+      "dates": "Feb 2021 - Aug 2022",
+      "bullets": ["bullet1", "bullet2", "bullet3", "bullet4"]
+    },
+    {
+      "title": "Senior Systems Engineer",
+      "company": "Infosys",
+      "location": "Hyderabad, India",
+      "dates": "Feb 2018 - Jan 2021",
+      "bullets": ["bullet1", "bullet2", "bullet3", "bullet4"]
+    }
+  ]
+}

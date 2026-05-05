@@ -26,7 +26,7 @@ export async function fetchStats(): Promise<Stats> {
 export async function generateDocument(
   jobId: number,
   docType: "resume" | "cover_letter"
-): Promise<{ download_url: string; cached: boolean }> {
+): Promise<{ blob: Blob; filename: string }> {
   const endpoint = docType === "resume" ? "resume" : "cover-letter";
   const res = await fetch(`${BASE}/generate/${endpoint}/${jobId}`, {
     method: "POST",
@@ -35,12 +35,29 @@ export async function generateDocument(
     const body = await res.json().catch(() => ({}));
     throw new Error(body.detail || `Generation failed: ${res.status}`);
   }
-  return res.json();
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition") || "";
+  const match = disposition.match(/filename="(.+?)"/);
+  const ext = docType === "resume" ? "docx" : "pdf";
+  const filename = match ? match[1] : `${docType}_${jobId}.${ext}`;
+  return { blob, filename };
 }
 
 export async function getJobDescription(jobId: number): Promise<string> {
   const res = await fetch(`${BASE}/jobs/${jobId}/description`);
   if (!res.ok) return "";
+  const data = await res.json();
+  return data.description || "";
+}
+
+export async function fetchJobDescription(jobId: number): Promise<string> {
+  const res = await fetch(`${BASE}/jobs/${jobId}/fetch-description`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.detail || `Failed to fetch description: ${res.status}`);
+  }
   const data = await res.json();
   return data.description || "";
 }
@@ -57,12 +74,19 @@ export async function setJobDescription(jobId: number, description: string): Pro
   }
 }
 
-export async function getGenerationStatus(jobId: number): Promise<{
-  resume: { generated: boolean; url: string; created_at: string } | null;
-  cover_letter: { generated: boolean; url: string; created_at: string } | null;
-}> {
-  const res = await fetch(`${BASE}/generate/status/${jobId}`);
-  if (!res.ok) return { resume: null, cover_letter: null };
+export async function getLLMProvider(): Promise<{ provider: string; nvidia_model: string; ollama_model: string }> {
+  const res = await fetch(`${BASE}/llm-provider`);
+  if (!res.ok) return { provider: "ollama", nvidia_model: "", ollama_model: "" };
+  return res.json();
+}
+
+export async function setLLMProvider(provider: string): Promise<{ provider: string }> {
+  const res = await fetch(`${BASE}/llm-provider`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider }),
+  });
+  if (!res.ok) throw new Error("Failed to switch provider");
   return res.json();
 }
 

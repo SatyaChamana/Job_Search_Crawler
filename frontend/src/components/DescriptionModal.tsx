@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Job } from "../types";
-import { getJobDescription, setJobDescription } from "../api";
+import { getJobDescription, setJobDescription, fetchJobDescription } from "../api";
 import { Modal } from "./Modal";
 import { Spinner } from "./Spinner";
 
@@ -14,6 +14,7 @@ export function DescriptionModal({ job, onClose, onToast }: Props) {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     if (!job) return;
@@ -22,6 +23,20 @@ export function DescriptionModal({ job, onClose, onToast }: Props) {
       .then((desc) => setDescription(desc))
       .finally(() => setLoading(false));
   }, [job]);
+
+  async function handleFetch() {
+    if (!job) return;
+    setFetching(true);
+    try {
+      const desc = await fetchJobDescription(job.id);
+      setDescription(desc);
+      onToast("Job description fetched", "success");
+    } catch (e) {
+      onToast(e instanceof Error ? e.message : "Failed to fetch", "error");
+    } finally {
+      setFetching(false);
+    }
+  }
 
   async function handleSave() {
     if (!job) return;
@@ -45,9 +60,19 @@ export function DescriptionModal({ job, onClose, onToast }: Props) {
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Paste the job description below. This will be used for resume/cover letter generation instead of scraping.
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Fetch from the job URL or paste manually.
+            </p>
+            <button
+              onClick={handleFetch}
+              disabled={fetching}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
+            >
+              {fetching && <Spinner />}
+              {fetching ? "Fetching..." : "Fetch from URL"}
+            </button>
+          </div>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}

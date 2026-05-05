@@ -11,7 +11,7 @@ interface Props {
   onToggleSelect: (id: number) => void;
   onToggleAll: () => void;
   onToast: (text: string, type: "success" | "error" | "info") => void;
-  onShowPreview: (job: Job, docType: "resume" | "cover_letter") => void;
+  onShowPreview: (job: Job, docType: "resume" | "cover_letter", blobUrl: string) => void;
   onShowDescription: (job: Job) => void;
 }
 

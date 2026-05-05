@@ -13,8 +13,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(jobs.router, prefix="/api")
 app.include_router(generate.router, prefix="/api")
+app.include_router(jobs.router, prefix="/api")
 
 
 @app.get("/health")
